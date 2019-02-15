@@ -46,6 +46,11 @@ table.tx-rkwnewsletter-list th {
 	background-color: #e64415;
 	color: #fff;
 }
+/* overwrite header color */
+table.tx-rkwnewsletter-list tr.stage99 th {
+    background-color: #333;
+    color: #fff;
+}
 
 table.tx-rkwnewsletter-list table.tx-rkwnewsletter-list__inner th {
     background-color: transparent;
@@ -56,4 +61,11 @@ table.tx-rkwnewsletter-list a,
 table.tx-rkwnewsletter-list a:link,
 table.tx-rkwnewsletter-list a:visited {
     color:#e64415;
+}
+
+/* overwrite link color */
+table.tx-rkwnewsletter-list tr.stage99 a,
+table.tx-rkwnewsletter-list tr.stage99 a:link,
+table.tx-rkwnewsletter-list tr.stage99 a:visited {
+    color: #333;
 }

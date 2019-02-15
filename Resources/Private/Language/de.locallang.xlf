@@ -109,6 +109,10 @@
                 <source>Oh no! An unexpected error occurred. Please contact your trusted administrator.</source>
                 <target>Och nö! Ein unerwarteter Fehler ist aufgetreten. Bitte wenden Sie sich an den Administrator Ihres Vertrauens.</target>
             </trans-unit>
+            <trans-unit id="releaseController.message.revokeSuccessful">
+                <source>Okay! Successfully revoked.  The newsletter output was set to the stage before. A notification to the respective editors will be sent shortly.</source>
+                <target>In Ordnung! Die Freigabe wurde zurückgezogen. Die Newsletterausgabe wurde auf die vorherige Freigabestufe gesetzt. Eine Benachrichtigung an die betreffenden Redakteure wird in Kürze versendet.</target>
+            </trans-unit>
             
             
             <!-- subscriptionController -->
@@ -246,6 +250,10 @@
 				<source>Approve now</source>
 				<target>Jetzt freigeben</target>
 			</trans-unit>
+			<trans-unit id="tx_rkwnewsletter_backend_partials_release_approval.revokeApproval">
+                <source>Revoke approval</source>
+                <target>Freigabe zurücknehmen</target>
+            </trans-unit>
 
 
 			<!-- Templates/Backend/Release/TestList.html -->

@@ -134,15 +134,14 @@ class ReleaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      */
     public function listAction()
     {
-        $issuesOpenApprovalStage1List = $this->issueRepository->findAllToApproveOnStage1ByBackendUser(intval($GLOBALS['BE_USER']->user['uid']));
-        $issuesOpenApprovalStage2List = $this->issueRepository->findAllToApproveOnStage2ByBackendUser(intval($GLOBALS['BE_USER']->user['uid']));
-
         $this->view->assignMultiple(
             array(
-                'issuesOpenApprovalStage1List' => $issuesOpenApprovalStage1List,
-                'issuesOpenApprovalStage2List' => $issuesOpenApprovalStage2List,
-                'backendUserId'                => intval($GLOBALS['BE_USER']->user['uid']),
-                'backendUserName'              => $GLOBALS['BE_USER']->user['realName'],
+                'issuesOpenApprovalStage1List'  => $this->issueRepository->findAllToApproveOnStage1ByBackendUser(intval($GLOBALS['BE_USER']->user['uid'])),
+                'issuesOpenApprovalStage2List'  => $this->issueRepository->findAllToApproveOnStage2ByBackendUser(intval($GLOBALS['BE_USER']->user['uid'])),
+                'issuesApprovedStage1List'      => $this->issueRepository->findAllApprovedOnStage1ByBackendUser(intval($GLOBALS['BE_USER']->user['uid'])),
+                'issuesApprovedStage2List'      => $this->issueRepository->findAllApprovedOnStage2ByBackendUser(intval($GLOBALS['BE_USER']->user['uid'])),
+                'backendUserId'                 => intval($GLOBALS['BE_USER']->user['uid']),
+                'backendUserName'               => $GLOBALS['BE_USER']->user['realName'],
             )
         );
     }
@@ -187,6 +186,52 @@ class ReleaseController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
                 'rkw_newsletter'
             ), '', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
         }
+
+        $this->redirect('list');
+        //===
+    }
+
+    /**
+     * action approve
+     *
+     * @param \RKW\RkwNewsletter\Domain\Model\Approval $approval
+     * @return void
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\UnknownObjectException
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
+     * @ignorevalidation $approval
+     */
+    public function revokeAction(\RKW\RkwNewsletter\Domain\Model\Approval $approval)
+    {
+        /** @var \RKW\RkwNewsletter\Domain\Model\BackendUser $backendUser */
+        $backendUser = $this->backendUserRepository->findByUid(intval($GLOBALS['BE_USER']->user['uid']));
+
+        // remove last approval
+        // remove setAllowedTstampStage && setAllowedByUserStage
+        if (
+            $approval->getAllowedTstampStage2()
+            && $approval->getAllowedByUserStage2()
+        ) {
+            $approval->setAllowedTstampStage2(0);
+        } else {
+            $approval->setAllowedTstampStage1(0);
+        }
+
+        // Set correct values for issue? (via cron?)
+        $approval->getIssue()->setStatus(1);
+
+        // @toDo: Send mails that the approval was revoked
+
+        // remove
+        $this->approvalRepository->update($approval);
+
+        $this->approvalHelper->updatePagePerms($approval);
+
+        $this->addFlashMessage(\TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate(
+            'releaseController.message.revokeSuccessful',
+            'rkw_newsletter'
+        ), '', \TYPO3\CMS\Core\Messaging\FlashMessage::OK);
 
         $this->redirect('list');
         //===

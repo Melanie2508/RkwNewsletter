@@ -4,7 +4,7 @@
 <f:if condition="{issues}">
     <f:then>
         <table class="tx-rkwnewsletter-list">
-            <tr>
+            <tr class="stage{stage}">
                 <th>
                     <f:translate key="tx_rkwnewsletter_backend_partials_release_issues.title" />
                 </th>
@@ -17,7 +17,7 @@
             </tr>
 
             <f:for each="{issues}" as="issue">
-                <tr>
+                <tr class="stage{stage}">
                     <!-- title -->
                     <td>
                         <f:if condition="{issue.status} < 2">
@@ -54,9 +54,8 @@
         </table>
     </f:then>
     <f:else>
-        <f:translate key="tx_rkwnewsletter_backend_partials_release_issues.noIssuesWaiting" />
+        <f:if condition="{stage} < 99">
+            <f:translate key="tx_rkwnewsletter_backend_partials_release_issues.noIssuesWaiting" />
+        </f:if>
     </f:else>
 </f:if>
-
-
-

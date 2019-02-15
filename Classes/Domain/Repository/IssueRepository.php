@@ -181,6 +181,7 @@ class IssueRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         //===
     }
 
+
     /**
      *  findAllToSend
      *
@@ -200,6 +201,66 @@ class IssueRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         );
 
         $query->setLimit($limit);
+
+        return $query->execute();
+        //===
+    }
+
+
+    /**
+     * findAllApprovedOnStage1ByBackendUser
+     * -> get approved stages (for revoke functionality)
+     *
+     * @param int $backendUser
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException
+     */
+    public function findAllApprovedOnStage1ByBackendUser($backendUser)
+    {
+        $query = $this->createQuery();
+
+        $query->matching(
+            $query->logicalAnd(
+                // is furthermore status 1
+                $query->equals('status', 1),
+                // has no release timestamp
+                $query->equals('releaseTstamp', 0),
+                // is the backendUser itself, who has approved
+                $query->equals('approvals.allowedByUserStage1', $backendUser),
+                $query->greaterThan('approvals.allowedTstampStage1', 0),
+                // no stage2 approval
+                $query->equals('approvals.allowedTstampStage2', 0)
+            )
+        );
+
+        return $query->execute();
+        //===
+    }
+
+
+
+    /**
+     * findAllApprovedOnStage2ByBackendUser
+     * -> get approved stages (for revoke functionality)
+     *
+     * @param int $backendUser
+     * @return \TYPO3\CMS\Extbase\Persistence\QueryResultInterface
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException
+     */
+    public function findAllApprovedOnStage2ByBackendUser($backendUser)
+    {
+        $query = $this->createQuery();
+
+        $query->matching(
+            $query->logicalAnd(
+            // is furthermore status 1
+                $query->equals('status', 1),
+                // has no release timestamp
+                $query->equals('releaseTstamp', 0),
+                // is the backendUser itself, who has approved
+                $query->equals('approvals.allowedByUserStage2', $backendUser)
+            )
+        );
 
         return $query->execute();
         //===

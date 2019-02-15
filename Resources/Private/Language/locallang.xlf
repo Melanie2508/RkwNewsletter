@@ -87,6 +87,9 @@
             <trans-unit id="releaseController.error.unexpected">
                 <source>Oh no! An unexpected error occurred. Please contact your trusted administrator.</source>
             </trans-unit>
+            <trans-unit id="releaseController.message.revokeSuccessful">
+                <source>Okay! Successfully revoked.  The newsletter output was set to the stage before. A notification to the respective editors will be sent shortly.</source>
+            </trans-unit>
 
 
             <!-- subscriptionController -->
@@ -193,6 +196,9 @@
             </trans-unit>
             <trans-unit id="tx_rkwnewsletter_backend_partials_release_approval.approve">
                 <source>Approve now</source>
+            </trans-unit>
+            <trans-unit id="tx_rkwnewsletter_backend_partials_release_approval.revokeApproval">
+                <source>Revoke approval</source>
             </trans-unit>
 
 

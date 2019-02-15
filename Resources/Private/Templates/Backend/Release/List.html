@@ -26,12 +26,13 @@ Otherwise your changes will be overwritten the next time you save the extension 
         <f:translate key="templates_backend_release_list.approvalsStage1" />
     </h2>
     <f:render partial="Release/Issues" arguments="{backendUserId: backendUserId, issues : issuesOpenApprovalStage1List, stage : 1}" />
+    <f:render partial="Release/Issues" arguments="{backendUserId: backendUserId, issues : issuesApprovedStage1List, stage : 99}" />
 
     <h2>
         <f:translate key="templates_backend_release_list.approvalsStage2" />
     </h2>
     <f:render partial="Release/Issues" arguments="{backendUserId: backendUserId, issues : issuesOpenApprovalStage2List, stage : 2}" />
-
+    <f:render partial="Release/Issues" arguments="{backendUserId: backendUserId, issues : issuesApprovedStage2List, stage : 99}" />
 
 </f:section>
 

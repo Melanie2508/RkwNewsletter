@@ -21,7 +21,7 @@ if (TYPO3_MODE === 'BE') {
 		'management',		// Submodule key
 		'',					// Position
 		array(
-			'Release' => 'list, approve, defer, testList, test, sendList, send',
+			'Release' => 'list, approve, defer, testList, test, sendList, send, revoke',
 		),
 		array(
 			'access' => 'user,group',

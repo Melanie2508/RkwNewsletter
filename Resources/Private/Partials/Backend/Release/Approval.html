@@ -93,6 +93,9 @@
                                     <f:if condition="{approval.allowedTstampStage2}">
                                         <f:then>
                                             <f:translate key="tx_rkwnewsletter_backend_partials_release_approval.alreadyApproved" />
+                                            <f:link.action action="revoke" arguments="{approval : approval, stage : stage}">
+                                                &gt; <f:translate key="tx_rkwnewsletter_backend_partials_release_approval.revokeApproval" />
+                                            </f:link.action>
                                         </f:then>
                                         <f:else>
                                             <f:if condition="<rkwNewsletter:IsBackendUserAllowedApproval approval='{approval}' backendUserId='{backendUserId}' stage='{stage}' />">
@@ -116,7 +119,12 @@
                         <f:else>
                             <f:if condition="{approval.allowedTstampStage1}">
                                 <f:then>
-                                    <f:translate key="tx_rkwnewsletter_backend_partials_release_approval.alreadyApproved" />
+                                    <f:comment>
+                                        <f:translate key="tx_rkwnewsletter_backend_partials_release_approval.alreadyApproved" />
+                                    </f:comment>
+                                    <f:link.action action="revoke" arguments="{approval : approval, stage : stage}">
+                                        &gt; <f:translate key="tx_rkwnewsletter_backend_partials_release_approval.revokeApproval" />
+                                    </f:link.action>
                                 </f:then>
                                 <f:else>
                                     <f:if condition="<rkwNewsletter:IsBackendUserAllowedApproval approval='{approval}' backendUserId='{backendUserId}' stage='{stage}' />">
