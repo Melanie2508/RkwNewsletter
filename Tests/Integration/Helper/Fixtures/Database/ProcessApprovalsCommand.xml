@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+
+    <!-- NEWSLETTER -->
+    <tx_rkwnewsletter_domain_model_newsletter>
+        <uid>1</uid>
+        <name>Newsletter 1</name>
+        <issue_title>RKW Newsletter</issue_title>
+        <rythm>2</rythm>
+        <last_issue_tstamp>1575976051</last_issue_tstamp>
+        <starttime>0</starttime>
+        <endtime>0</endtime>
+        <hidden>0</hidden>
+        <deleted>0</deleted>
+        <topic>3</topic>
+    </tx_rkwnewsletter_domain_model_newsletter>
+
+
+    <!-- TOPIC -->
+    <tx_rkwnewsletter_domain_model_topic>
+        <uid>1</uid>
+        <name>Allgemein</name>
+        <newsletter>1</newsletter>
+        <container_page>4699</container_page>
+    </tx_rkwnewsletter_domain_model_topic>
+    <tx_rkwnewsletter_domain_model_topic>
+        <uid>2</uid>
+        <name>Gründung</name>
+        <newsletter>1</newsletter>
+        <container_page>4697</container_page>
+    </tx_rkwnewsletter_domain_model_topic>
+    <tx_rkwnewsletter_domain_model_topic>
+        <uid>3</uid>
+        <name>Innovation</name>
+        <newsletter>1</newsletter>
+        <container_page>4698</container_page>
+    </tx_rkwnewsletter_domain_model_topic>
+    <tx_rkwnewsletter_domain_model_topic>
+        <uid>4</uid>
+        <name>Fachkräfte</name>
+        <newsletter>1</newsletter>
+        <container_page>4696</container_page>
+    </tx_rkwnewsletter_domain_model_topic>
+
+    <!-- ISSUE -->
+
+    <!-- issue with status 1 - waiting for approval -->
+    <tx_rkwnewsletter_domain_model_issue>
+        <uid>1</uid>
+        <title>Issue 1</title>
+        <status>1</status>
+        <newsletter>1</newsletter>
+        <recipients> </recipients>
+        <sent_tstamp>0</sent_tstamp>
+        <release_tstamp>0</release_tstamp>
+    </tx_rkwnewsletter_domain_model_issue>
+
+    <!-- APPROVAL -->
+    <tx_rkwnewsletter_domain_model_approval>
+        <uid>1</uid>
+        <topic>1</topic>
+        <issue>1</issue>
+        <page>1</page>
+        <allowed_by_user_stage1>0</allowed_by_user_stage1>
+        <allowed_by_user_stage2>0</allowed_by_user_stage2>
+        <allowed_tstamp_stage1>0</allowed_tstamp_stage1>
+        <allowed_tstamp_stage2>0</allowed_tstamp_stage2>
+        <sent_info_tstamp_stage1>0</sent_info_tstamp_stage1>
+        <sent_info_tstamp_stage2>0</sent_info_tstamp_stage2>
+        <sent_reminder_tstamp_stage1>0</sent_reminder_tstamp_stage1>
+        <sent_reminder_tstamp_stage2>0</sent_reminder_tstamp_stage2>
+    </tx_rkwnewsletter_domain_model_approval>
+
+
+    <!-- PAGES -->
+    <pages>
+        <uid>1</uid>
+        <pid>0</pid>
+        <title>Rootpage</title>
+        <tx_rkwbasics_teaser_text />
+        <tx_rkwbasics_information />
+        <tx_rkwnewsletter_teaser_text />
+        <doktype>1</doktype>
+        <perms_everybody>15</perms_everybody>
+    </pages>
+
+    <pages>
+        <uid>4696</uid>
+        <title>Container Page 1</title>
+        <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
+        <tx_rkwbasics_information> </tx_rkwbasics_information>
+        <tx_rkwnewsletter_teaser_text> </tx_rkwnewsletter_teaser_text>
+    </pages>
+    <pages>
+        <uid>4697</uid>
+        <title>Container Page 2</title>
+        <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
+        <tx_rkwbasics_information> </tx_rkwbasics_information>
+        <tx_rkwnewsletter_teaser_text> </tx_rkwnewsletter_teaser_text>
+    </pages>
+    <pages>
+        <uid>4698</uid>
+        <title>Container Page 3</title>
+        <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
+        <tx_rkwbasics_information> </tx_rkwbasics_information>
+        <tx_rkwnewsletter_teaser_text> </tx_rkwnewsletter_teaser_text>
+    </pages>
+    <pages>
+        <uid>4699</uid>
+        <title>Container Page 4</title>
+        <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
+        <tx_rkwbasics_information> </tx_rkwbasics_information>
+        <tx_rkwnewsletter_teaser_text> </tx_rkwnewsletter_teaser_text>
+    </pages>
+
+    <!-- a topic newsletter page -->
+    <pages>
+        <uid>500</uid>
+        <title>Page of Newsletter 1 with Topic 1</title>
+        <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
+        <tx_rkwbasics_information> </tx_rkwbasics_information>
+        <tx_rkwnewsletter_teaser_text> </tx_rkwnewsletter_teaser_text>
+        <tx_rkwnewsletter_newsletter>1</tx_rkwnewsletter_newsletter>
+        <tx_rkwnewsletter_topic>1</tx_rkwnewsletter_topic>
+        <doktype>1</doktype>
+        <tx_rkwnewsletter_include_tstamp>0</tx_rkwnewsletter_include_tstamp>
+        <tx_rkwnewsletter_exclude>0</tx_rkwnewsletter_exclude>
+        <deleted>0</deleted>
+        <hidden>0</hidden>
+        <starttime>0</starttime>
+        <tx_rkwnewsletter_teaser_image>1</tx_rkwnewsletter_teaser_image>
+    </pages>
+
+    <!-- PAGES -->
+    <tt_content>
+        <uid>1</uid>
+        <pid>0</pid>
+        <header>TtContent Test</header>
+        <bodytext>test bodytext</bodytext>
+        <header_link>1</header_link>
+        <CType>textpic</CType>
+        <imagecols>1</imagecols>
+        <tx_rkwbasics_bodytext_mobile> </tx_rkwbasics_bodytext_mobile>
+    </tt_content>
+
+
+    <!-- SYS FILE REFERENCE -->
+    <sys_file_reference>
+        <uid>1</uid>
+        <pid>0</pid>
+        <uid_local>1</uid_local>
+        <uid_foreign>500</uid_foreign>
+        <tablenames>pages</tablenames>
+        <fieldname>txRkwnewsletterTeaserImage</fieldname>
+        <table_local>sys_file</table_local>
+        <l10n_diffsource>[BLOB - 134 B]</l10n_diffsource>
+    </sys_file_reference>
+
+
+    <!-- SYS FILE REFERENCE -->
+    <sys_file>
+        <uid>1</uid>
+        <pid>0</pid>
+        <type>2</type>
+        <storage>0</storage>
+        <identifier>/typo3/sysext/t3skin/icons/gfx/typo3logo.gif</identifier>
+        <extension>png</extension>
+        <mime_type>image/gif</mime_type>
+        <name>typo3logo.png</name>
+    </sys_file>
+
+</dataset>

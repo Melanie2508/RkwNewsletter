@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+
+    <!-- NEWSLETTER -->
+    <tx_rkwnewsletter_domain_model_newsletter>
+        <uid>1</uid>
+        <pid>4600</pid>
+        <name>Newsletter 1</name>
+        <issue_title>RKW Newsletter</issue_title>
+        <rythm>2</rythm>
+        <last_issue_tstamp>1575976051</last_issue_tstamp>
+        <starttime>0</starttime>
+        <endtime>0</endtime>
+        <hidden>0</hidden>
+        <deleted>0</deleted>
+    </tx_rkwnewsletter_domain_model_newsletter>
+    
+    <!-- ISSUE -->
+
+    <!-- issue with status 1 - waiting for approval -->
+    <tx_rkwnewsletter_domain_model_issue>
+        <uid>1</uid>
+        <pid>4600</pid>
+        <title>Issue 1</title>
+        <status>1</status>
+        <newsletter>1</newsletter>
+        <recipients> </recipients>
+        <sent_tstamp>0</sent_tstamp>
+        <release_tstamp>0</release_tstamp>
+    </tx_rkwnewsletter_domain_model_issue>
+
+    <!-- APPROVAL -->
+    <tx_rkwnewsletter_domain_model_approval>
+        <uid>1</uid>
+        <pid>4600</pid>
+        <topic>1</topic>
+        <issue>1</issue>
+        <page>1</page>
+        <allowed_by_user_stage1>0</allowed_by_user_stage1>
+        <allowed_by_user_stage2>0</allowed_by_user_stage2>
+        <allowed_tstamp_stage1>0</allowed_tstamp_stage1>
+        <allowed_tstamp_stage2>0</allowed_tstamp_stage2>
+        <sent_info_tstamp_stage1>0</sent_info_tstamp_stage1>
+        <sent_info_tstamp_stage2>0</sent_info_tstamp_stage2>
+        <sent_reminder_tstampt_stage1>0</sent_reminder_tstampt_stage1>
+        <sent_reminder_tstampt_stage2>0</sent_reminder_tstampt_stage2>
+    </tx_rkwnewsletter_domain_model_approval>
+
+</dataset>
