@@ -6,11 +6,11 @@
 {content.header}\n
 ==================================================\n
 <f:format.stripTags>
-    <rkwMailer:frontend.rteLinks plaintextFormat="true">
+    <rkwMailer:frontend.replace.rteLinks plaintextFormat="true">
         <f:format.raw>
             <rkwMailer:plaintextLineBreaks keepLineBreaks="true">{content.bodytext}</rkwMailer:plaintextLineBreaks>
         </f:format.raw>
-    </rkwMailer:frontend.rteLinks>
+    </rkwMailer:frontend.replace.rteLinks>
 </f:format.stripTags>
 
 <f:if condition="{content.headerLink}">
@@ -58,7 +58,7 @@
         <!-- content -->
         <tr>
             <td style="padding: 11px 16px {f:if(condition: '{content.headerLink}', then: '0', else: '24px')}; line-height: 22px">
-                <f:format.html parseFuncTSPath="lib.parseFunc_RTE"><rkwMailer:frontend.rteLinks style="color: {page.txRkwnewsletterTopic.primaryColor}"><f:format.raw>{content.bodytext}</f:format.raw></rkwMailer:frontend.rteLinks></f:format.html>
+                <f:format.html parseFuncTSPath="lib.parseFunc_RTE"><rkwMailer:frontend.replace.rteLinks style="color: {page.txRkwnewsletterTopic.primaryColor}"><f:format.raw>{content.bodytext}</f:format.raw></rkwMailer:frontend.replace.rteLinks></f:format.html>
             </td>
         </tr>
 

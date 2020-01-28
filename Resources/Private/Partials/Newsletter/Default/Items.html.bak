@@ -6,7 +6,7 @@
 <f:section name="Plaintext">
     <f:if condition="{pages}">
         <f:for each="{pages}" as="page">
-            <rkwMailer:frontend.replaceLinksRedirect queueRecipient="{queueRecipient}" queueMail="{queueMail}" isPlaintext="true">
+            <rkwMailer:frontend.replace.redirectLinks queueRecipient="{queueRecipient}" queueMail="{queueMail}" isPlaintext="true">
                 <f:if condition="<rkwMailer:cache.hasRenderCache queueMail='{queueMail}' isPlaintext='true' additionalIdentifier='{page.uid}-{webView}-{includeEditorials}' />">
                     <f:then>
                         <rkwMailer:cache.getRenderCache queueMail="{queueMail}" isPlaintext="true" additionalIdentifier="{page.uid}-{webView}-{includeEditorials}" marker="{pagesOrder : pagesOrder}"/>
@@ -29,7 +29,7 @@
                         </rkwMailer:cache.setRenderCache>
                     </f:else>
                 </f:if>
-            </rkwMailer:frontend.replaceLinksRedirect>
+            </rkwMailer:frontend.replace.redirectLinks>
         </f:for>
     </f:if>
 </f:section>
@@ -41,7 +41,7 @@
 
         <f:for each="{pages}" as="page" iteration="pageIterator">
 
-            <rkwMailer:frontend.replaceLinksRedirect queueRecipient="{queueRecipient}" queueMail="{queueMail}">
+            <rkwMailer:frontend.replace.redirectLinks queueRecipient="{queueRecipient}" queueMail="{queueMail}">
 
                 <f:if condition="<rkwMailer:cache.hasRenderCache queueMail='{queueMail}' additionalIdentifier='{page.uid}-{webView}-{includeEditorials}' />">
                     <f:then>
@@ -87,7 +87,7 @@
                     </f:else>
                 </f:if>
 
-            </rkwMailer:frontend.replaceLinksRedirect>
+            </rkwMailer:frontend.replace.redirectLinks>
         </f:for>
     </f:if>
 

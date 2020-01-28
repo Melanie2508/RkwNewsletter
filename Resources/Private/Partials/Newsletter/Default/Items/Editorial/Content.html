@@ -32,7 +32,7 @@
         <!-- content -->
         <tr>
             <td style="{f:if(condition: '{content.header}', then: 'padding: 0 0 6px 0;', else: 'padding: 18px 0 6px 0;')}  color: #fff; line-height: 22px">
-                <f:format.html parseFuncTSPath="lib.parseFunc_RTE"><rkwMailer:frontend.rteLinks style="color: {page.txRkwnewsletterTopic.secondaryColorEditorial}"><f:format.raw>{content.bodytext}</f:format.raw></rkwMailer:frontend.rteLinks></f:format.html>
+                <f:format.html parseFuncTSPath="lib.parseFunc_RTE"><rkwMailer:frontend.replace.rteLinks style="color: {page.txRkwnewsletterTopic.secondaryColorEditorial}"><f:format.raw>{content.bodytext}</f:format.raw></rkwMailer:frontend.replace.rteLinks></f:format.html>
             </td>
         </tr>
 

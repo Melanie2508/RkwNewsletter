@@ -13,7 +13,7 @@
 
                 <f:else>
                     <rkwMailer:cache.setRenderCache queueMail="{queueMail}" isPlaintext="true" additionalIdentifier="{page.uid}-{webView}-{includeEditorials}" marker="{pagesOrder : pagesOrder}">
-                        <rkwMailer:frontend.replaceLinksRedirect queueMail="{queueMail}" isPlaintext="true">
+                        <rkwMailer:frontend.replace.redirectLinks queueMail="{queueMail}" isPlaintext="true">
                             <f:for each="<rkwNewsletter:getNewsletterContents issue='{issue}' page='{page}' includeEditorials='{includeEditorials}' />" as="content" iteration="itemIterator">
                                 <f:if condition="{iterator.cycle} < {maxItemsPerTopic}">
                                     <f:then>
@@ -26,7 +26,7 @@
                                     </f:else>
                                 </f:if>
                             </f:for>
-                        </rkwMailer:frontend.replaceLinksRedirect>
+                        </rkwMailer:frontend.replace.redirectLinks>
                     </rkwMailer:cache.setRenderCache>
                 </f:else>
             </f:if>
@@ -47,7 +47,7 @@
                 </f:then>
                 <f:else>
                     <rkwMailer:cache.setRenderCache queueMail="{queueMail}" additionalIdentifier="{page.uid}-{webView}-{includeEditorials}" marker="{pagesOrder : pagesOrder}">
-                        <rkwMailer:frontend.replaceLinksRedirect queueMail="{queueMail}">
+                        <rkwMailer:frontend.replace.redirectLinks queueMail="{queueMail}">
 
                             <f:for each="<rkwNewsletter:getNewsletterContents issue='{issue}' page='{page}' includeEditorials='{includeEditorials}' />" as="content" iteration="itemIterator">
 
@@ -83,7 +83,7 @@
                                     </f:else>
                                 </f:if>
                             </f:for>
-                        </rkwMailer:frontend.replaceLinksRedirect>
+                        </rkwMailer:frontend.replace.redirectLinks>
                     </rkwMailer:cache.setRenderCache>
                 </f:else>
             </f:if>
