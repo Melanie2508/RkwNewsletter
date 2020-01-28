@@ -141,27 +141,21 @@ class IssueTest extends FunctionalTestCase
     }
 
 
-    /**
-     * @test
-     */
-    public function buildIssue_FindAllToBuildIssue_GivesToleranceAndDayOfMonth_ReturnsTrue()
-    {
-        // ts data fetched from rkw-kompetenzzentrum.de cron
-        $tolerance = 604800;
-        $dayOfMonth = 15;
-
-        $newsletterList = $this->newsletterRepository->findAllToBuildIssue($tolerance, $dayOfMonth);
-
-    //    static::assertCount(1, $newsletterList);
-    }
-
-
 
     /**
      * @test
      */
-    public function buildIssue_CreateAndPersist_GivenNewsletterCreatesIssue_ReturnsTrue()
+    public function CreateIssueWithGivenNewsletter()
     {
+
+        /**
+         * Scenario:
+         *
+         * Given Newsletter
+         * When a issue is created and data set from newsletter configuriation
+         * Then an instance of issue is created; and the title is successfully copied
+         */
+
         $newsletterList[] = $this->newsletterRepository->findByIdentifier(1);
 
         // =============
@@ -174,7 +168,7 @@ class IssueTest extends FunctionalTestCase
             // 1. create issue
             /** @var \RKW\RkwNewsletter\Domain\Model\Issue $issue */
             $issue = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Issue');
-            $issue->setTitle('Some issue title for testing');
+            $issue->setTitle($newsletter->getIssueTitle());
             $issue->setStatus(0);
 
             // persist in order to get uid
@@ -184,7 +178,7 @@ class IssueTest extends FunctionalTestCase
         //    $this->persistenceManager->persistAll();
 
             static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Issue', $issue);
-            static::assertObjectHasAttribute('title', $issue);
+            static::assertEquals($issue->getTitle(), $newsletter->getIssueTitle());
         }
     }
 
@@ -193,30 +187,19 @@ class IssueTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function buildIssue_IterateTopics_GivenNewsletterExpects4Topics_ReturnsTrue()
+    public function CreateContainerPageWithRelationToCertainTopic()
     {
-        $newsletter = $this->newsletterRepository->findByIdentifier(1);
 
-        // =============
-        // 2. Build topic pages in container-pages
-        /** @var \RKW\RkwNewsletter\Domain\Model\Topic $topic */
-        if (count($newsletter->getTopic())) {
+        /**
+         * Scenario:
+         *
+         * Given Issue
+         * Given Newsletter
+         * Given Topic
+         * When a containerPage is created and a specific topic is set
+         * Then an instance of pages (containerPage) is created; and the topic is correctly assigned
+         */
 
-            static::assertCount(4, $newsletter->getTopic());
-
-            foreach ($newsletter->getTopic()->toArray() as $topic) {
-                static::assertObjectHasAttribute('name', $topic);
-            }
-        }
-    }
-
-
-
-    /**
-     * @test
-     */
-    public function buildIssue_GenerateContainerPage_GivenTopicCreatePage_ReturnsTrue()
-    {
         $issue = $this->issueRepository->findByIdentifier(1);
         $newsletter = $this->newsletterRepository->findByIdentifier(1);
         $topic = $this->topicRepository->findByIdentifier(1);
@@ -251,8 +234,18 @@ class IssueTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function buildIssue_CreateLanguageOverlay_GivenNewsletterWithChangesLanguage_ReturnsTrue()
+    public function CreateContainerPageTranslationIfSysLanguageUidIsGreaterThanZero()
     {
+
+        /**
+         * Scenario:
+         *
+         * Given ContainerPage
+         * Given Newsletter
+         * When the sysLanguageUid is greater 0 and an additional containerPage (language overlay-table) is created
+         * Then an instance of pagesLanguageOverlay is created; and the content of the standard containerPage is copied
+         */
+
         /** @var \RKW\RkwNewsletter\Domain\Model\Pages $containerPage */
         $containerPage = $this->pagesRepository->findByIdentifier(4696);
         /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
@@ -285,8 +278,19 @@ class IssueTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function buildIssue_CreateApproval_GivenIssueAndTopicAndContainerPage_ReturnsTrue()
+    public function CreateContainerPageApprovalAfterContainerPageIsCreated()
     {
+
+        /**
+         * Scenario:
+         *
+         * Given Issue
+         * Given Topic
+         * Given ContainerPage
+         * When a new containerPage is created (show test before)
+         * Then a new approval is instantiated and added to issue
+         */
+
         /** @var \RKW\RkwNewsletter\Domain\Model\Issue $issue */
         $issue = $this->issueRepository->findByIdentifier(1);
         $topic = $this->topicRepository->findByIdentifier(1);
@@ -308,34 +312,23 @@ class IssueTest extends FunctionalTestCase
     }
 
 
-    /**
-     * @test
-     */
-    public function buildIssue_FetchPagesWithCertainTopicWhichAreNotUsedYet_GivenTopic_ReturnsTrue()
-    {
-        $topic = $this->topicRepository->findByIdentifier(1);
-
-        // =============
-        // 3. Get all pages with same topic of newsletter which are not used yet
-        // find pages with newsletter-content
-
-        $pagesList = $this->pagesRepository->findByTopicNotIncluded($topic);
-        static::assertCount(1, $pagesList);
-        if (count($pagesList) > 0) {
-
-            /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
-            foreach ($pagesList as $page) {
-                static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $page);
-            }
-        }
-    }
-
 
     /**
      * @test
      */
-    public function buildIssue_CreateContentElement_GivenPage_ReturnsTrue()
+    public function CreateAndAddContentToContainerPageCreateContentElement()
     {
+
+        /**
+         * Scenario:
+         *
+         * Given Newsletter
+         * Given ContainerPage
+         * Given Page
+         * When a container page is filled with page content which is not used for newsletter yet
+         * Then a new content element is instantiated and added to the containerPage
+         */
+
         /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
         $newsletter = $this->newsletterRepository->findByIdentifier(1);
 
@@ -373,6 +366,7 @@ class IssueTest extends FunctionalTestCase
         $this->ttContentRepository->add($ttContentElement);
 
         static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\TtContent', $ttContentElement);
+        static::assertEquals($ttContentElement->getPid(), $containerPage->getUid());
     }
 
 
@@ -380,8 +374,18 @@ class IssueTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function buildIssue_SetImage_GivenPage_ReturnsTrue()
+    public function CreateAndAddContentToContainerPageAddImageToContentElement()
     {
+
+        /**
+         * Scenario:
+         *
+         * Given Page
+         * Given ContainerElement
+         * When a content element is created and includes an image
+         * Then a new file reference is instantiated and added to the content element
+         */
+
         /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
         $page = $this->pagesRepository->findByIdentifier(500);
 
@@ -400,6 +404,9 @@ class IssueTest extends FunctionalTestCase
             /** @var \RKW\RkwBasics\Domain\Model\FileReference $fileReference */
             $fileReference = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwBasics\\Domain\\Model\\FileReference');
 
+            $backendUserAuthentication = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
+            $GLOBALS['BE_USER'] = $backendUserAuthentication;
+
             // "$image->getOriginalResource()" wirft Fehler:
             // Call to a member function isAdmin() on null in /var/www/rkw-website-composer/vendor/typo3/cms/typo3/sysext/core/Classes/Resource/Security/StoragePermissionsAspect.php on line 64
             // --> Funktion "->getOriginalResource()" benötigt eingeloggten backend user
@@ -415,7 +422,68 @@ class IssueTest extends FunctionalTestCase
             // $ttContentElement->addImage($fileReference);
             // $ttContentRepository->update($ttContentElement);
             $this->ttContentRepository->updateImage($ttContentElement);
+        }
+    }
 
+
+    /**
+     * @test
+     * @deprecated
+     */
+    public function buildIssue_FindAllToBuildIssue_GivesToleranceAndDayOfMonth_ReturnsTrue()
+    {
+        // ts data fetched from rkw-kompetenzzentrum.de cron
+        $tolerance = 604800;
+        $dayOfMonth = 15;
+
+        $newsletterList = $this->newsletterRepository->findAllToBuildIssue($tolerance, $dayOfMonth);
+
+        //static::assertCount(1, $newsletterList);
+    }
+
+
+    /**
+     * @test
+     * @deprecated
+     */
+    public function buildIssue_IterateTopics_GivenNewsletterExpects4Topics_ReturnsTrue()
+    {
+        $newsletter = $this->newsletterRepository->findByIdentifier(1);
+
+        // =============
+        // 2. Build topic pages in container-pages
+        /** @var \RKW\RkwNewsletter\Domain\Model\Topic $topic */
+        if (count($newsletter->getTopic())) {
+
+            static::assertCount(4, $newsletter->getTopic());
+
+            foreach ($newsletter->getTopic()->toArray() as $topic) {
+                static::assertObjectHasAttribute('name', $topic);
+            }
+        }
+    }
+
+
+    /**
+     * @test
+     * @deprecated
+     */
+    public function buildIssue_FetchPagesWithCertainTopicWhichAreNotUsedYet_GivenTopic_ReturnsTrue()
+    {
+        $topic = $this->topicRepository->findByIdentifier(1);
+
+        // =============
+        // 3. Get all pages with same topic of newsletter which are not used yet
+        // find pages with newsletter-content
+
+        $pagesList = $this->pagesRepository->findByTopicNotIncluded($topic);
+        static::assertCount(1, $pagesList);
+        if (count($pagesList) > 0) {
+
+            /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
+            foreach ($pagesList as $page) {
+                static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $page);
+            }
         }
     }
 
