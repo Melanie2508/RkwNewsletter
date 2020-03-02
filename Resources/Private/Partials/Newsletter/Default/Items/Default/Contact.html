@@ -29,12 +29,12 @@
                         <f:if condition="{author.imageBoxes}">
                             <f:then>
                                 <td style="padding: 5px 12px 0 16px; vertical-align: top; ">
-                                    <f:image image="{author.imageBoxes}" treatIdAsReference="true" absolute="false" alt="<rkwAuthors:GetCombinedName author='{author}'/>" width="80" style="border:1px solid #D3D3D3;" />
+                                    <rkwMailer:frontend.image image="{author.imageBoxes}" treatIdAsReference="true" absolute="false" alt="<rkwAuthors:GetCombinedName author='{author}'/>" width="80" style="border:1px solid #D3D3D3;" />
                                 </td>
                             </f:then>
                             <f:else>
                                 <td style="padding: 5px 12px 0 16px; vertical-align: top; ">
-                                    <f:image src="EXT:rkw_authors/Resources/Public/Images/author-box-small-fallback.jpg" absolute="false" alt="<rkwAuthors:GetCombinedName author='{author}'/>" width="80c" height="80c" style="border:1px solid #D3D3D3;" />
+                                    <rkwMailer:frontend.image src="EXT:rkw_authors/Resources/Public/Images/author-box-small-fallback.jpg" absolute="false" alt="<rkwAuthors:GetCombinedName author='{author}'/>" width="80c" height="80c" style="border:1px solid #D3D3D3;" />
                                 </td>
                             </f:else>
                         </f:if>

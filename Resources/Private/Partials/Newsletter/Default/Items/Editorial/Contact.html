@@ -18,7 +18,7 @@
                     <tr>
                         <f:if condition="{author.imageBoxes}">
                             <td style="padding: 5px 12px 0 0; vertical-align: top">
-                                <f:image image="{author.imageBoxes}" treatIdAsReference="true" absolute="false" alt="<rkwAuthors:GetCombinedName author='{author}'/>" width="80"  />
+                                <rkwMailer:frontend.image image="{author.imageBoxes}" treatIdAsReference="true" absolute="false" alt="<rkwAuthors:GetCombinedName author='{author}'/>" width="80"  />
                             </td>
                         </f:if>
                         <td style="color: #fff; font-size: 12px; line-height: 24px">
