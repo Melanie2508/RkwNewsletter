@@ -35,6 +35,8 @@ config.tx_extbase.persistence {
                 tableName = pages_language_overlay
                 columns {
                     sys_language_uid.mapOnProperty = sysLanguageUid
+                    uid.mapOnProperty = uid
+                    pid.mapOnProperty = pid
                 }
             }
         }

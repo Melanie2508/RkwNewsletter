@@ -65,10 +65,11 @@ class Issue extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 
     /**
      * recipients
+     * throws error without default value: Field 'recipients' doesn't have a default value
      *
      * @var string
      */
-    protected $recipients;
+    protected $recipients = '';
 
 
     /**

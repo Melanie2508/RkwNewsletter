@@ -67,6 +67,21 @@ class PagesLanguageOverlay extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntit
      */
     protected $txRkwnewsletterTeaserLink;
 
+    /**
+     * txRkwbasicsTeaserText
+     * set default value to avoid an error: "Field 'tx_rkwbasics_teaser_text' doesn't have a default value"
+     *
+     * @var string
+     */
+    protected $txRkwbasicsTeaserText = '';
+
+    /**
+     * txRkwbasicsInformation
+     * set default value to avoid an error: "Field 'tx_rkwbasics_information' doesn't have a default value"
+     *
+     * @var string
+     */
+    protected $txRkwbasicsInformation = '';
 
     /**
      * Returns the title

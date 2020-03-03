@@ -106,10 +106,11 @@ class Pages extends \RKW\RkwNewsletter\Domain\Model\PagesAbstract
 
     /**
      * txRkwnewsletterTeaserText
+     * set default value to avoid an error: "Field 'tx_rkwbasics_teaser_text' doesn't have a default value"
      *
      * @var string
      */
-    protected $txRkwnewsletterTeaserText;
+    protected $txRkwnewsletterTeaserText = '';
 
     /**
      * txRkwnewsletterTeaserImage

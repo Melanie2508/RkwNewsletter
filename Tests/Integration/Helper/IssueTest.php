@@ -116,7 +116,7 @@ class IssueTest extends FunctionalTestCase
         $this->setUpFrontendRootPage(
             1,
             [
-                //'EXT:rkw_newsletter/Configuration/TypoScript/setup.txt',
+                'EXT:rkw_newsletter/Configuration/TypoScript/setup.txt',
                 //'EXT:rkw_registration/Configuration/TypoScript/setup.txt',
                 //'EXT:rkw_mailer/Configuration/TypoScript/setup.txt',
 
@@ -153,33 +153,23 @@ class IssueTest extends FunctionalTestCase
          *
          * Given Newsletter
          * When a issue is created and data set from newsletter configuriation
-         * Then an instance of issue is created; and the title is successfully copied
+         * Then an instance of issue is created
+         * Then the title is successfully copied
+         * Then the issue is part of the newsletter (configuration)
          */
 
-        $newsletterList[] = $this->newsletterRepository->findByIdentifier(1);
+        $newsletter = $this->newsletterRepository->findByIdentifier(1);
 
-        // =============
-        // Get all relevant pages and create an issue
-        /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
-        foreach ($newsletterList as $newsletter) {
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setNewsletter($newsletter);
+        $issueHelper->createIssue();
 
-            static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Newsletter', $newsletter);
-
-            // 1. create issue
-            /** @var \RKW\RkwNewsletter\Domain\Model\Issue $issue */
-            $issue = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Issue');
-            $issue->setTitle($newsletter->getIssueTitle());
-            $issue->setStatus(0);
-
-            // persist in order to get uid
-            $this->issueRepository->add($issue);
-            $newsletter->addIssue($issue);
-        //    $this->newsletterRepository->update($newsletter);
-        //    $this->persistenceManager->persistAll();
-
-            static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Issue', $issue);
-            static::assertEquals($issue->getTitle(), $newsletter->getIssueTitle());
-        }
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Issue', $issueHelper->getIssue());
+        static::assertEquals($issueHelper->getIssue()->getTitle(), $newsletter->getIssueTitle());
+        static::assertContains($issueHelper->getIssue(), $issueHelper->getNewsletter()->getIssue());
     }
 
 
@@ -189,50 +179,72 @@ class IssueTest extends FunctionalTestCase
      */
     public function CreateContainerPageWithRelationToCertainTopic()
     {
-
         /**
          * Scenario:
          *
          * Given Issue
          * Given Newsletter
          * Given Topic
-         * When a containerPage is created and a specific topic is set
-         * Then an instance of pages (containerPage) is created; and the topic is correctly assigned
+         * When a containerPage is created
+         * When a specific topic is set
+         * Then an instance of pages (containerPage) is created
+         * Then the topic is correctly assigned
          */
 
         $issue = $this->issueRepository->findByIdentifier(1);
         $newsletter = $this->newsletterRepository->findByIdentifier(1);
         $topic = $this->topicRepository->findByIdentifier(1);
 
-        if ($topic->getContainerPage() instanceof \RKW\RkwNewsletter\Domain\Model\Pages) {
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setIssue($issue);
+        $issueHelper->setNewsletter($newsletter);
+        $issueHelper->createContainerPage($topic);
 
-            // 2.1 creates a new container page for the topic
-            /** @var \RKW\RkwNewsletter\Domain\Model\Pages $containerPage */
-            $containerPage = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Pages');
-            $containerPage->setTitle($issue->getTitle());
-            $containerPage->setDokType(1);
-            $containerPage->setPid($topic->getContainerPage()->getUid());
-            $containerPage->setNoSearch(true);
-            $containerPage->setTxRkwnewsletterExclude(true);
-
-            $this->pagesRepository->add($containerPage);
-
-            // persist in order to get uid
-        //    $this->persistenceManager->persistAll();
-
-            /** Do this after page has been saved! */
-            $containerPage->setTxRkwnewsletterNewsletter($newsletter);
-            $containerPage->setTxRkwnewsletterTopic($topic);
-
-            static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $containerPage);
-            static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Topic', $containerPage->getTxRkwnewsletterTopic());
-        }
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $issueHelper->getContainerPage());
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Topic', $issueHelper->getContainerPage()->getTxRkwnewsletterTopic());
     }
 
 
 
     /**
      * @test
+     */
+    public function CreateContainerPageWithoutRelationToCertainTopic()
+    {
+        /**
+         * Scenario:
+         *
+         * Given Issue
+         * Given Newsletter
+         * Given Topic
+         * When a specific topic is set
+         * Then an instance of pages (containerPage) is created
+         * Then the topic is correctly assigned
+         */
+
+        $issue = $this->issueRepository->findByIdentifier(1);
+        $newsletter = $this->newsletterRepository->findByIdentifier(1);
+        $topic = $this->topicRepository->findByIdentifier(1);
+
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setIssue($issue);
+        $issueHelper->setNewsletter($newsletter);
+        $issueHelper->createContainerPage($topic);
+
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $issueHelper->getContainerPage());
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Topic', $issueHelper->getContainerPage()->getTxRkwnewsletterTopic());
+    }
+
+
+
+    /**
+     *
      */
     public function CreateContainerPageTranslationIfSysLanguageUidIsGreaterThanZero()
     {
@@ -243,7 +255,10 @@ class IssueTest extends FunctionalTestCase
          * Given ContainerPage
          * Given Newsletter
          * When the sysLanguageUid is greater 0 and an additional containerPage (language overlay-table) is created
-         * Then an instance of pagesLanguageOverlay is created; and the content of the standard containerPage is copied
+         * Then an instance of pagesLanguageOverlay is created
+         * Then and the content of the standard containerPage is copied - check 'title'
+         * Then and the content of the standard containerPage is copied - check 'pid'
+         * Then and the content of the standard containerPage is copied - check 'sysLanguageOverlay'
          */
 
         /** @var \RKW\RkwNewsletter\Domain\Model\Pages $containerPage */
@@ -254,23 +269,19 @@ class IssueTest extends FunctionalTestCase
         // set another language uid than 0 (default)
         $newsletter->setSysLanguageUid(1);
 
-        if ($newsletter->getSysLanguageUid() > 0) {
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setContainerPage($containerPage);
+        $issueHelper->setNewsletter($newsletter);
+        $issueHelper->createContainerPageTranslation();
 
-            /** @var \RKW\RkwNewsletter\Domain\Model\PagesLanguageOverlay $containerPageLanguageOverlay */
-            $containerPageLanguageOverlay = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay');
-            $containerPageLanguageOverlay->setTitle($containerPage->getTitle());
-            $containerPageLanguageOverlay->setPid($containerPage->getUid());
-            $containerPageLanguageOverlay->setSysLanguageUid($newsletter->getSysLanguageUid());
-            $this->pagesLanguageOverlayRepository->add($containerPageLanguageOverlay);
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay', $issueHelper->getContainerPageLanguageOverlay());
+        static::assertEquals($containerPage->getTitle(), $issueHelper->getContainerPageLanguageOverlay()->getTitle());
+        static::assertEquals($containerPage->getUid(), $issueHelper->getContainerPageLanguageOverlay()->getPid());
+        static::assertEquals($newsletter->getSysLanguageUid(), $issueHelper->getContainerPageLanguageOverlay()->getSysLanguageUid());
 
-            // persist in order to get an uid - only needed because of workaround for tt_content!
-        //    $this->persistenceManager->persistAll();
-
-            static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay', $containerPageLanguageOverlay);
-            static::assertEquals($containerPage->getTitle(), $containerPageLanguageOverlay->getTitle());
-            static::assertEquals($containerPage->getUid(), $containerPageLanguageOverlay->getPid());
-            static::assertEquals($newsletter->getSysLanguageUid(), $containerPageLanguageOverlay->getSysLanguageUid());
-        }
     }
 
 
@@ -280,7 +291,6 @@ class IssueTest extends FunctionalTestCase
      */
     public function CreateContainerPageApprovalAfterContainerPageIsCreated()
     {
-
         /**
          * Scenario:
          *
@@ -296,17 +306,19 @@ class IssueTest extends FunctionalTestCase
         $topic = $this->topicRepository->findByIdentifier(1);
         /** @var \RKW\RkwNewsletter\Domain\Model\Pages $containerPage */
         $containerPage = $this->pagesRepository->findByIdentifier(4696);
+        /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
+        $newsletter = $this->newsletterRepository->findByIdentifier(1);
 
         // Issue got already 1 approval through database scheme
         static::assertCount(1, $issue->getApprovals());
 
-        /** @var \RKW\RkwNewsletter\Domain\Model\Approval $approval */
-        $approval = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Approval');
-        $approval->setTopic($topic);
-        $approval->setPage($containerPage);
-
-        $this->approvalRepository->add($approval);
-        $issue->addApprovals($approval);
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setNewsletter($newsletter);
+        $issueHelper->setIssue($issue);
+        $issueHelper->setContainerPage($containerPage);
+        $issueHelper->createContainerPageApproval($topic);
 
         static::assertCount(2, $issue->getApprovals());
     }
@@ -314,7 +326,7 @@ class IssueTest extends FunctionalTestCase
 
 
     /**
-     * @test
+     * Actually not in use: Don't know how / what to test in this fragmented function now
      */
     public function CreateAndAddContentToContainerPageCreateContentElement()
     {
@@ -329,6 +341,8 @@ class IssueTest extends FunctionalTestCase
          * Then a new content element is instantiated and added to the containerPage
          */
 
+        $topic = $this->topicRepository->findByIdentifier(1);
+
         /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
         $newsletter = $this->newsletterRepository->findByIdentifier(1);
 
@@ -339,31 +353,11 @@ class IssueTest extends FunctionalTestCase
         $page = $this->pagesRepository->findByIdentifier(500);
         $pageTranslated = $page;
 
-        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
-        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
-        $ttContentElement->setPid($containerPage->getUid());
-        $ttContentElement->setSysLanguageUid($newsletter->getSysLanguageUid());
-        $ttContentElement->setContentType('textpic');
-        $ttContentElement->setImageCols(1);
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->createAndAddContentToContainerPage($topic);
 
-        // 3.3 set texts
-        $ttContentElement->setHeader($pageTranslated->getTxRkwnewsletterTeaserHeading() ? $pageTranslated->getTxRkwnewsletterTeaserHeading() : $pageTranslated->getTitle());
-        $ttContentElement->setBodytext($pageTranslated->getTxRkwnewsletterTeaserText() ? $pageTranslated->getTxRkwnewsletterTeaserText() : $pageTranslated->getTxRkwbasicsTeaserText());
-        $ttContentElement->setHeaderLink($page->getTxRkwnewsletterTeaserLink() ? $page->getTxRkwnewsletterTeaserLink() : $page->getUid());
-
-        // get authors from rkw_authors if installed and set
-        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rkw_authors')) {
-            static::assertInstanceOf('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage', $page->getTxRkwauthorsAuthorship());
-
-            $ttContentElement->setTxRkwNewsletterAuthors($page->getTxRkwauthorsAuthorship());
-
-            foreach ($ttContentElement->getTxRkwnewsletterAuthors() as $author) {
-                static::assertInstanceOf('RKW\\RkwAuthors\\Domain\\Model\\Authors', $author);
-            }
-        }
-
-        // add object
-        $this->ttContentRepository->add($ttContentElement);
 
         static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\TtContent', $ttContentElement);
         static::assertEquals($ttContentElement->getPid(), $containerPage->getUid());
@@ -374,117 +368,110 @@ class IssueTest extends FunctionalTestCase
     /**
      * @test
      */
-    public function CreateAndAddContentToContainerPageAddImageToContentElement()
+    public function CreateContentElementForContainerPage()
     {
+        /**
+         * Scenario:
+         *
+         * Given Page
+         * Given ContainerElement
+         * When a newsletter content page is given
+         * Then a new content element is created
+         * Then the new content element got the container page PID
+         * Then the TeaserHeading of the newsletterPage is copied to the new content element
+         * Then the TeaserText of the newsletterPage is copied to the new content element
+         */
 
+        /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
+        $newsletter = $this->newsletterRepository->findByIdentifier(1);
+        /** @var \RKW\RkwNewsletter\Domain\Model\Pages $containerPage */
+        $containerPage = $this->pagesRepository->findByIdentifier(4696);
+        /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
+        $newsletterTeaserPage = $this->pagesRepository->findByIdentifier(500);
+
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setNewsletter($newsletter);
+        $issueHelper->setContainerPage($containerPage);
+        $ttContentElement = $issueHelper->createContentElement($newsletterTeaserPage);
+
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\TtContent', $ttContentElement);
+        static::assertEquals($ttContentElement->getPid(), $containerPage->getUid());
+        static::assertEquals($ttContentElement->getHeader(), $newsletterTeaserPage->getTxRkwnewsletterTeaserHeading());
+        static::assertEquals($ttContentElement->getBodytext(), $newsletterTeaserPage->getTxRkwnewsletterTeaserText());
+    }
+
+
+
+    /**
+     * @test
+     */
+    public function CreateFileReferenceWithGivenImage()
+    {
         /**
          * Scenario:
          *
          * Given Page
          * Given ContainerElement
          * When a content element is created and includes an image
-         * Then a new file reference is instantiated and added to the content element
+         * Then a new file reference is instantiated
+         * Then the new file has a relationship to the given content element (uid / foreignUid)
+         * Then the new file has a relationship to the given content element (table)
          */
 
+        /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
+        $newsletter = $this->newsletterRepository->findByIdentifier(1);
         /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
         $page = $this->pagesRepository->findByIdentifier(500);
 
         /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
         $ttContentElement = $this->ttContentRepository->findByIdentifier(1);
 
-        // 3.4 set image
-        /** @var \RKW\RkwBasics\Domain\Model\FileReference $image */
-        $image = $page->getTxRkwnewsletterTeaserImage() ? $page->getTxRkwnewsletterTeaserImage() : ($page->getTxRkwbasicsTeaserImage() ? $page->getTxRkwbasicsTeaserImage() : null);
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setNewsletter($newsletter);
+        $newFileReference = $issueHelper->createFileReference($page, $ttContentElement);
 
-        static::assertInstanceOf('RKW\\RkwBasics\\Domain\\Model\\FileReference', $image);
-
-
-        $fileReference = null;
-        if ($image) {
-            /** @var \RKW\RkwBasics\Domain\Model\FileReference $fileReference */
-            $fileReference = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwBasics\\Domain\\Model\\FileReference');
-
-            $backendUserAuthentication = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
-            $GLOBALS['BE_USER'] = $backendUserAuthentication;
-
-            // "$image->getOriginalResource()" wirft Fehler:
-            // Call to a member function isAdmin() on null in /var/www/rkw-website-composer/vendor/typo3/cms/typo3/sysext/core/Classes/Resource/Security/StoragePermissionsAspect.php on line 64
-            // --> Funktion "->getOriginalResource()" benötigt eingeloggten backend user
-            $fileReference->setOriginalResource($image->getOriginalResource());
-
-            $fileReference->setTablenames('tt_content');
-            $fileReference->setTableLocal('sys_file');
-            $fileReference->setFile($image->getFile());
-            $fileReference->setUidForeign($ttContentElement->getUid());
-
-         //   $this->fileReferenceRepository->add($fileReference);
-
-            // $ttContentElement->addImage($fileReference);
-            // $ttContentRepository->update($ttContentElement);
-            $this->ttContentRepository->updateImage($ttContentElement);
-        }
+        static::assertInstanceOf('RKW\\RkwBasics\\Domain\\Model\\FileReference', $newFileReference);
+        static::assertEquals($ttContentElement->getUid(), $newFileReference->getUidForeign());
+        static::assertEquals('tt_content', $newFileReference->getTablenames());
     }
+
 
 
     /**
      * @test
-     * @deprecated
      */
-    public function buildIssue_FindAllToBuildIssue_GivesToleranceAndDayOfMonth_ReturnsTrue()
+    public function CreateFileReferenceWithoutImage()
     {
-        // ts data fetched from rkw-kompetenzzentrum.de cron
-        $tolerance = 604800;
-        $dayOfMonth = 15;
+        /**
+         * Scenario:
+         *
+         * Given Page
+         * Given ContainerElement
+         * When a content element is created without an image
+         * Then no file reference is instantiated
+         * Then the return value is null
+         */
 
-        $newsletterList = $this->newsletterRepository->findAllToBuildIssue($tolerance, $dayOfMonth);
-
-        //static::assertCount(1, $newsletterList);
-    }
-
-
-    /**
-     * @test
-     * @deprecated
-     */
-    public function buildIssue_IterateTopics_GivenNewsletterExpects4Topics_ReturnsTrue()
-    {
+        /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
         $newsletter = $this->newsletterRepository->findByIdentifier(1);
+        /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
+        $page = $this->pagesRepository->findByIdentifier(501);
 
-        // =============
-        // 2. Build topic pages in container-pages
-        /** @var \RKW\RkwNewsletter\Domain\Model\Topic $topic */
-        if (count($newsletter->getTopic())) {
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
+        $ttContentElement = $this->ttContentRepository->findByIdentifier(1);
 
-            static::assertCount(4, $newsletter->getTopic());
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setNewsletter($newsletter);
+        $newFileReference = $issueHelper->createFileReference($page, $ttContentElement);
 
-            foreach ($newsletter->getTopic()->toArray() as $topic) {
-                static::assertObjectHasAttribute('name', $topic);
-            }
-        }
-    }
-
-
-    /**
-     * @test
-     * @deprecated
-     */
-    public function buildIssue_FetchPagesWithCertainTopicWhichAreNotUsedYet_GivenTopic_ReturnsTrue()
-    {
-        $topic = $this->topicRepository->findByIdentifier(1);
-
-        // =============
-        // 3. Get all pages with same topic of newsletter which are not used yet
-        // find pages with newsletter-content
-
-        $pagesList = $this->pagesRepository->findByTopicNotIncluded($topic);
-        static::assertCount(1, $pagesList);
-        if (count($pagesList) > 0) {
-
-            /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
-            foreach ($pagesList as $page) {
-                static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $page);
-            }
-        }
+        static::assertNotInstanceOf('RKW\\RkwBasics\\Domain\\Model\\FileReference', $newFileReference);
+        static::assertNull($newFileReference);
     }
 
 

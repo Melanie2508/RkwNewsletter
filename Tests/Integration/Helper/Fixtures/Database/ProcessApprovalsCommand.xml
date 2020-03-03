@@ -77,13 +77,13 @@
         <uid>1</uid>
         <pid>0</pid>
         <title>Rootpage</title>
-        <tx_rkwbasics_teaser_text />
         <tx_rkwbasics_information />
         <tx_rkwnewsletter_teaser_text />
         <doktype>1</doktype>
         <perms_everybody>15</perms_everybody>
+        <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
+        <tx_rkwnewsletter_teaser_text> </tx_rkwnewsletter_teaser_text>
     </pages>
-
     <pages>
         <uid>4696</uid>
         <title>Container Page 1</title>
@@ -119,7 +119,8 @@
         <title>Page of Newsletter 1 with Topic 1</title>
         <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
         <tx_rkwbasics_information> </tx_rkwbasics_information>
-        <tx_rkwnewsletter_teaser_text> </tx_rkwnewsletter_teaser_text>
+        <tx_rkwnewsletter_teaser_text>Test RkwNewsletter Teaser Text</tx_rkwnewsletter_teaser_text>
+        <tx_rkwnewsletter_teaser_heading>Test RkwNewsletter Teaser Heading</tx_rkwnewsletter_teaser_heading>
         <tx_rkwnewsletter_newsletter>1</tx_rkwnewsletter_newsletter>
         <tx_rkwnewsletter_topic>1</tx_rkwnewsletter_topic>
         <doktype>1</doktype>
@@ -131,7 +132,26 @@
         <tx_rkwnewsletter_teaser_image>1</tx_rkwnewsletter_teaser_image>
     </pages>
 
-    <!-- PAGES -->
+    <!-- a topic newsletter page without image -->
+    <pages>
+        <uid>501</uid>
+        <title>Page of Newsletter 1 with Topic 1 without image</title>
+        <tx_rkwbasics_teaser_text> </tx_rkwbasics_teaser_text>
+        <tx_rkwbasics_information> </tx_rkwbasics_information>
+        <tx_rkwnewsletter_teaser_text>Test RkwNewsletter Teaser Text</tx_rkwnewsletter_teaser_text>
+        <tx_rkwnewsletter_teaser_heading>Test RkwNewsletter Teaser Heading</tx_rkwnewsletter_teaser_heading>
+        <tx_rkwnewsletter_newsletter>1</tx_rkwnewsletter_newsletter>
+        <tx_rkwnewsletter_topic>1</tx_rkwnewsletter_topic>
+        <doktype>1</doktype>
+        <tx_rkwnewsletter_include_tstamp>0</tx_rkwnewsletter_include_tstamp>
+        <tx_rkwnewsletter_exclude>0</tx_rkwnewsletter_exclude>
+        <deleted>0</deleted>
+        <hidden>0</hidden>
+        <starttime>0</starttime>
+        <tx_rkwnewsletter_teaser_image>0</tx_rkwnewsletter_teaser_image>
+    </pages>
+
+    <!-- TT CONTENT -->
     <tt_content>
         <uid>1</uid>
         <pid>0</pid>

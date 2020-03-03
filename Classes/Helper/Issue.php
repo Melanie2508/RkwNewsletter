@@ -274,7 +274,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
      *
      * @return void
      */
-    private function createIssue()
+    public function createIssue()
     {
         /** @var \RKW\RkwNewsletter\Domain\Model\Issue $issue */
         $this->issue = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Issue');
@@ -295,10 +295,10 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
     /**
      * createContainerPage
      *
-     * @param \RKW\RkwNewsletter\Domain\Model\Topic
+     * @param \RKW\RkwNewsletter\Domain\Model\Topic $topic
      * @return void
      */
-    private function createContainerPage(\RKW\RkwNewsletter\Domain\Model\Topic $topic)
+    public function createContainerPage(\RKW\RkwNewsletter\Domain\Model\Topic $topic)
     {
         /** @var \RKW\RkwNewsletter\Domain\Model\Pages $containerPage */
         $this->containerPage = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Pages');
@@ -317,7 +317,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
         $this->containerPage->setTxRkwnewsletterNewsletter($this->newsletter);
         $this->containerPage->setTxRkwnewsletterTopic($topic);
 
-        $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Created container page with id=%s for topic "%s" in parent page with id=%s for newsletter with id=%s.', $containerPage->getUid(), $topic->getName(), $topic->getContainerPage()->getUid(), $this->newsletter->getUid()));
+        $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Created container page with id=%s for topic "%s" in parent page with id=%s for newsletter with id=%s.', $this->containerPage->getUid(), $topic->getName(), $topic->getContainerPage()->getUid(), $this->newsletter->getUid()));
     }
 
 
@@ -327,20 +327,26 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
      *
      * @return void
      */
-    private function createContainerPageTranslation()
+    public function createContainerPageTranslation()
     {
-        if ($this->newsletter->getSysLanguageUid() > 0) {
+        // Hint: Works with PagesLanguageOverlay. Deprecated since TYPO3 9.5
+        if (version_compare(TYPO3_version, '9.5.0', '<=')) {
 
-            /** @var \RKW\RkwNewsletter\Domain\Model\PagesLanguageOverlay $containerPageLanguageOverlay */
-            $this->containerPageLanguageOverlay = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay');
-            $this->containerPageLanguageOverlay->setTitle($this->containerPage->getTitle());
-            $this->containerPageLanguageOverlay->setPid($this->containerPage->getUid());
-            $this->containerPageLanguageOverlay->setSysLanguageUid($this->newsletter->getSysLanguageUid());
-            $this->pagesLanguageOverlayRepository->add($this->containerPageLanguageOverlay);
+            if ($this->newsletter->getSysLanguageUid() > 0) {
 
-            // persist in order to get an uid - only needed because of workaround for tt_content!
-            $this->persistenceManager->persistAll();
-            $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Created translation-page with uid=%s and SysLanguageUid=%s for container page with id=%s for newsletter with id=%s.', $this->containerPageLanguageOverlay->getUid(), $this->newsletter->getSysLanguageUid(), $this->containerPage->getUid(), $this->newsletter->getUid()));
+                /** @var \RKW\RkwNewsletter\Domain\Model\PagesLanguageOverlay $containerPageLanguageOverlay */
+                $this->containerPageLanguageOverlay = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay');
+                $this->containerPageLanguageOverlay->setTitle($this->containerPage->getTitle());
+                $this->containerPageLanguageOverlay->setPid($this->containerPage->getUid());
+                $this->containerPageLanguageOverlay->setSysLanguageUid($this->newsletter->getSysLanguageUid());
+
+                $this->pagesLanguageOverlayRepository->add($this->containerPageLanguageOverlay);
+
+                // persist in order to get an uid - only needed because of workaround for tt_content!
+                // @toDo: ERROR: By any reason the PID is lost through the persistAll command (see Tests)
+                $this->persistenceManager->persistAll();
+                $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Created translation-page with uid=%s and SysLanguageUid=%s for container page with id=%s for newsletter with id=%s.', $this->containerPageLanguageOverlay->getUid(), $this->newsletter->getSysLanguageUid(), $this->containerPage->getUid(), $this->newsletter->getUid()));
+            }
         }
     }
 
@@ -352,7 +358,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
      * @param \RKW\RkwNewsletter\Domain\Model\Topic
      * @return void
      */
-    private function createContainerPageApproval(\RKW\RkwNewsletter\Domain\Model\Topic $topic)
+    public function createContainerPageApproval(\RKW\RkwNewsletter\Domain\Model\Topic $topic)
     {
         /** @var \RKW\RkwNewsletter\Domain\Model\Approval $approval */
         $approval = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Approval');
@@ -361,7 +367,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
 
         $this->approvalRepository->add($approval);
         $this->issue->addApprovals($approval);
-        $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added an approval with uid=%s for topic "%s" for newsletter with id=%s.', $approval->getUid(), $topic->getName(), $this->newsletter->getUid()));
+        $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added an approval for topic "%s" for newsletter with id=%s.', $topic->getName(), $this->newsletter->getUid()));
 
     }
 
@@ -373,7 +379,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
      * @param \RKW\RkwNewsletter\Domain\Model\Topic
      * @return void
      */
-    private function createAndAddContentToContainerPage(\RKW\RkwNewsletter\Domain\Model\Topic $topic)
+    public function createAndAddContentToContainerPage(\RKW\RkwNewsletter\Domain\Model\Topic $topic)
     {
         $pagesList = $this->pagesRepository->findByTopicNotIncluded($topic);
         if (count($pagesList) > 0) {
@@ -381,72 +387,8 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
             /** @var \RKW\RkwNewsletter\Domain\Model\Pages $page */
             foreach ($pagesList as $page) {
 
-                // 3.1 Check if the newsletter has another language than the default one
-                // and fetch corresponding translation if available
-                $pageTranslated = $page;
-                if ($this->newsletter->getSysLanguageUid() > 0) {
-                    if ($tempPageTranslated = $this->pagesLanguageOverlayRepository->findByPid($page->getUid())) {
-                        $pageTranslated = $tempPageTranslated;
-                    }
-                }
-
-                // 3.2 create new content element for each page and put it into the container page
-                /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
-                $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
-                $ttContentElement->setPid($this->containerPage->getUid());
-                // @toDo: Add translation for TYPO3 >= 9.5
-                if (version_compare(TYPO3_version, '9.5.0', '<=')) {
-                    if ($this->newsletter->getSysLanguageUid() > 0) {
-                        $ttContentElement->setPid($this->containerPageLanguageOverlay->getUid());
-                    }
-                }
-                $ttContentElement->setSysLanguageUid($this->newsletter->getSysLanguageUid());
-                $ttContentElement->setContentType('textpic');
-                $ttContentElement->setImageCols(1);
-
-                // 3.3 set texts
-                $ttContentElement->setHeader($pageTranslated->getTxRkwnewsletterTeaserHeading() ? $pageTranslated->getTxRkwnewsletterTeaserHeading() : $pageTranslated->getTitle());
-                $ttContentElement->setBodytext($pageTranslated->getTxRkwnewsletterTeaserText() ? $pageTranslated->getTxRkwnewsletterTeaserText() : $pageTranslated->getTxRkwbasicsTeaserText());
-                $ttContentElement->setHeaderLink($page->getTxRkwnewsletterTeaserLink() ? $page->getTxRkwnewsletterTeaserLink() : $page->getUid());
-
-                // get authors from rkw_authors if installed and set
-                if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rkw_authors')) {
-                    $ttContentElement->setTxRkwNewsletterAuthors($page->getTxRkwauthorsAuthorship());
-                    $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added authors to tt_content-element for newsletter with id=%s.', $this->newsletter->getUid()));
-                }
-
-                // add object
-                $this->ttContentRepository->add($ttContentElement);
-                $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added tt-content-element with id=%s and SysLanguageUid=%s to container-page with uid=%s for newsletter with id=%s.', $ttContentElement->getUid(), $ttContentElement->getSysLanguageUid(), $this->containerPage->getUid(), $this->newsletter->getUid()));
-
-                // 3.4 set image
-                /** @var \RKW\RkwBasics\Domain\Model\FileReference $image */
-                $image = $page->getTxRkwnewsletterTeaserImage() ? $page->getTxRkwnewsletterTeaserImage() : ($page->getTxRkwbasicsTeaserImage() ? $page->getTxRkwbasicsTeaserImage() : null);
-                $fileReference = null;
-                if ($image) {
-
-                    // Needed for working with images
-                    // Without the backendUserAuth "$image->getOriginalResource()" throws an error:
-                    // Call to a member function isAdmin() on null in /var/www/rkw-website-composer/vendor/typo3/cms/typo3/sysext/core/Classes/Resource/Security/StoragePermissionsAspect.php on line 64
-                    $backendUserAuthentication = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
-                    $GLOBALS['BE_USER'] = $backendUserAuthentication;
-
-                    /** @var \RKW\RkwBasics\Domain\Model\FileReference $fileReference */
-                    $fileReference = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwBasics\\Domain\\Model\\FileReference');
-                    $fileReference->setOriginalResource($image->getOriginalResource());
-                    $fileReference->setTablenames('tt_content');
-                    $fileReference->setTableLocal('sys_file');
-                    $fileReference->setFile($image->getFile());
-                    $fileReference->setUidForeign($ttContentElement->getUid());
-
-                    $this->fileReferenceRepository->add($fileReference);
-
-                    // $ttContentElement->addImage($fileReference);
-                    // $ttContentRepository->update($ttContentElement);
-                    $this->ttContentRepository->updateImage($ttContentElement);
-                    $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added a fileReference with uid=%s to tt-content-element with id=%s for newsletter with id=%s.', $fileReference->getUid(), $ttContentElement->getUid(), $this->newsletter->getUid()));
-
-                }
+                // 3.1 create new content element for each page and put it into the container page
+                $this->createContentElement($page);
 
                 // 3.5 mark current page as already used
                 $page->setTxRkwnewsletterIncludeTstamp(time());
@@ -459,5 +401,193 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
         }
     }
 
+
+
+    /**
+     * createContentElement
+     *
+     * @param \RKW\RkwNewsletter\Domain\Model\Pages $page
+     * @return \RKW\RkwNewsletter\Domain\Model\TtContent
+     */
+    public function createContentElement(\RKW\RkwNewsletter\Domain\Model\Pages $page)
+    {
+        // 3.2 Check if the newsletter has another language than the default one
+        // and fetch corresponding translation if available
+        $pageTranslated = $page;
+        if ($this->newsletter->getSysLanguageUid() > 0) {
+            // Hint: Works with PagesLanguageOverlay. Deprecated since TYPO3 9.5
+            if (version_compare(TYPO3_version, '9.5.0', '<=')) {
+                if ($tempPageTranslated = $this->pagesLanguageOverlayRepository->findByPid($page->getUid())) {
+                    $pageTranslated = $tempPageTranslated;
+                }
+            }
+        }
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
+        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
+        $ttContentElement->setPid($this->containerPage->getUid());
+        // @toDo: Add translation for TYPO3 >= 9.5
+        if (version_compare(TYPO3_version, '9.5.0', '<=')) {
+            if ($this->newsletter->getSysLanguageUid() > 0) {
+                $ttContentElement->setPid($this->containerPageLanguageOverlay->getUid());
+            }
+        }
+        $ttContentElement->setSysLanguageUid($this->newsletter->getSysLanguageUid());
+        $ttContentElement->setContentType('textpic');
+        $ttContentElement->setImageCols(1);
+
+        // 3.3 set texts
+        $ttContentElement->setHeader($pageTranslated->getTxRkwnewsletterTeaserHeading() ? $pageTranslated->getTxRkwnewsletterTeaserHeading() : $pageTranslated->getTitle());
+        $ttContentElement->setBodytext($pageTranslated->getTxRkwnewsletterTeaserText() ? $pageTranslated->getTxRkwnewsletterTeaserText() : $pageTranslated->getTxRkwbasicsTeaserText());
+        $ttContentElement->setHeaderLink($page->getTxRkwnewsletterTeaserLink() ? $page->getTxRkwnewsletterTeaserLink() : $page->getUid());
+
+        // get authors from rkw_authors if installed and set
+        if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rkw_authors')) {
+            $ttContentElement->setTxRkwNewsletterAuthors($page->getTxRkwauthorsAuthorship());
+            $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added authors to tt_content-element for newsletter with id=%s.', $this->newsletter->getUid()));
+        }
+
+        // add object
+        $this->ttContentRepository->add($ttContentElement);
+
+        $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added tt-content-element with id=%s and SysLanguageUid=%s to container-page with uid=%s for newsletter with id=%s.', $ttContentElement->getUid(), $ttContentElement->getSysLanguageUid(), $this->containerPage->getUid(), $this->newsletter->getUid()));
+
+        // 3.4 set image
+        $this->createFileReference($page, $ttContentElement);
+
+        // just for testing
+        // one the one hand, a persistAll does not have an effect. On the other hand, we don't want so punish the DB with senseless queries
+        return $ttContentElement;
+        //===
+    }
+
+
+
+    /**
+     * createFileReference
+     *
+     * @param \RKW\RkwNewsletter\Domain\Model\Pages $page
+     * @param \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement
+     * @return \RKW\RkwBasics\Domain\Model\FileReference
+     */
+    public function createFileReference(\RKW\RkwNewsletter\Domain\Model\Pages $page, $ttContentElement)
+    {
+        /** @var \RKW\RkwBasics\Domain\Model\FileReference $image */
+        $image = $page->getTxRkwnewsletterTeaserImage() ? $page->getTxRkwnewsletterTeaserImage() : ($page->getTxRkwbasicsTeaserImage() ? $page->getTxRkwbasicsTeaserImage() : null);
+        $fileReference = null;
+        if ($image) {
+            // Needed for working with images
+            // Without the backendUserAuth "$image->getOriginalResource()" throws an error:
+            // Call to a member function isAdmin() on null in /var/www/rkw-website-composer/vendor/typo3/cms/typo3/sysext/core/Classes/Resource/Security/StoragePermissionsAspect.php on line 64
+            $backendUserAuthentication = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Authentication\BackendUserAuthentication::class);
+            $GLOBALS['BE_USER'] = $backendUserAuthentication;
+
+            /** @var \RKW\RkwBasics\Domain\Model\FileReference $fileReference */
+            $fileReference = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwBasics\\Domain\\Model\\FileReference');
+            $fileReference->setOriginalResource($image->getOriginalResource());
+            $fileReference->setTablenames('tt_content');
+            $fileReference->setTableLocal('sys_file');
+            $fileReference->setFile($image->getFile());
+            $fileReference->setUidForeign($ttContentElement->getUid());
+
+            $this->fileReferenceRepository->add($fileReference);
+
+            // $ttContentElement->addImage($fileReference);
+            // $ttContentRepository->update($ttContentElement);
+            $this->ttContentRepository->updateImage($ttContentElement);
+            $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added a fileReference with uid=%s to tt-content-element with id=%s for newsletter with id=%s.', $fileReference->getUid(), $ttContentElement->getUid(), $this->newsletter->getUid()));
+        }
+
+        // just for testing
+        return $fileReference;
+        //===
+    }
+
+
+
+    /**
+     * setIssue
+     * !! USE THIS ONLY FOR TESTING PURPOSE !!
+     *
+     * @param \RKW\RkwNewsletter\Domain\Model\Issue $issue
+     * @return void
+     */
+    public function setIssue(\RKW\RkwNewsletter\Domain\Model\Issue $issue)
+    {
+        $this->issue = $issue;
+    }
+
+    /**
+     * getIssue
+     * !! USE THIS ONLY FOR TESTING PURPOSE !!
+     *
+     * @return \RKW\RkwNewsletter\Domain\Model\Issue $issue
+     */
+    public function getIssue()
+    {
+        return $this->issue;
+        //===
+    }
+
+    /**
+     * setNewsletter
+     * !! USE THIS ONLY FOR TESTING PURPOSE !!
+     *
+     * @param \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter
+     * @return void
+     */
+    public function setNewsletter(\RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter)
+    {
+        $this->newsletter = $newsletter;
+    }
+
+    /**
+     * getNewsletter
+     * !! USE THIS ONLY FOR TESTING PURPOSE !!
+     *
+     * @return \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter
+     */
+    public function getNewsletter()
+    {
+        return $this->newsletter;
+        //===
+    }
+
+    /**
+     * setContainerPage
+     * !! USE THIS ONLY FOR TESTING PURPOSE !!
+     *
+     * @param \RKW\RkwNewsletter\Domain\Model\Pages $containerPage
+     * @return void
+     */
+    public function setContainerPage(\RKW\RkwNewsletter\Domain\Model\Pages $containerPage)
+    {
+        $this->containerPage = $containerPage;
+    }
+
+    /**
+     * getContainerPage
+     * !! USE THIS ONLY FOR TESTING PURPOSE !!
+     *
+     * @return \RKW\RkwNewsletter\Domain\Model\Pages
+     */
+    public function getContainerPage()
+    {
+        return $this->containerPage;
+        //===
+    }
+
+    /**
+     * getContainerPageLanguageOverlay
+     * !! USE THIS ONLY FOR TESTING PURPOSE !!
+     *
+     * @return \RKW\RkwNewsletter\Domain\Model\PagesLanguageOverlay
+     */
+    public function getContainerPageLanguageOverlay()
+    {
+        var_dump($this->containerPageLanguageOverlay->getPid()); exit;
+        return $this->containerPageLanguageOverlay;
+        //===
+    }
 
 }
