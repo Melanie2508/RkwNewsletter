@@ -244,7 +244,7 @@ class IssueTest extends FunctionalTestCase
 
 
     /**
-     *
+     * @test
      */
     public function CreateContainerPageTranslationIfSysLanguageUidIsGreaterThanZero()
     {
@@ -275,12 +275,13 @@ class IssueTest extends FunctionalTestCase
         $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
         $issueHelper->setContainerPage($containerPage);
         $issueHelper->setNewsletter($newsletter);
-        $issueHelper->createContainerPageTranslation();
+        $containerPageLanguageOverlay = $issueHelper->createContainerPageTranslation();
 
-        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay', $issueHelper->getContainerPageLanguageOverlay());
-        static::assertEquals($containerPage->getTitle(), $issueHelper->getContainerPageLanguageOverlay()->getTitle());
-        static::assertEquals($containerPage->getUid(), $issueHelper->getContainerPageLanguageOverlay()->getPid());
-        static::assertEquals($newsletter->getSysLanguageUid(), $issueHelper->getContainerPageLanguageOverlay()->getSysLanguageUid());
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay', $containerPageLanguageOverlay);
+        static::assertEquals($containerPage->getTitle(), $containerPageLanguageOverlay->getTitle());
+        // @toDo: By any reason the PID
+        static::assertEquals($containerPage->getUid(), $containerPageLanguageOverlay->getPid());
+        static::assertEquals($newsletter->getSysLanguageUid(), $containerPageLanguageOverlay->getSysLanguageUid());
 
     }
 

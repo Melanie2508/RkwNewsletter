@@ -325,7 +325,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
     /**
      * createContainerPageTranslation
      *
-     * @return void
+     * @return \RKW\RkwNewsletter\Domain\Model\PagesLanguageOverlay
      */
     public function createContainerPageTranslation()
     {
@@ -343,9 +343,13 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
                 $this->pagesLanguageOverlayRepository->add($this->containerPageLanguageOverlay);
 
                 // persist in order to get an uid - only needed because of workaround for tt_content!
-                // @toDo: ERROR: By any reason the PID is lost through the persistAll command (see Tests)
+                // @toDo: ERROR: By any reason the PID is not created through the persistAll command (see Tests)
                 $this->persistenceManager->persistAll();
                 $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Created translation-page with uid=%s and SysLanguageUid=%s for container page with id=%s for newsletter with id=%s.', $this->containerPageLanguageOverlay->getUid(), $this->newsletter->getSysLanguageUid(), $this->containerPage->getUid(), $this->newsletter->getUid()));
+
+                // just for testing - we don't want so punish the DB with senseless persist-queries
+                return $this->containerPageLanguageOverlay;
+                //===
             }
         }
     }
@@ -585,7 +589,6 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
      */
     public function getContainerPageLanguageOverlay()
     {
-        var_dump($this->containerPageLanguageOverlay->getPid()); exit;
         return $this->containerPageLanguageOverlay;
         //===
     }
