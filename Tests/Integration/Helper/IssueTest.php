@@ -10,10 +10,12 @@ use RKW\RkwNewsletter\Domain\Repository\TopicRepository;
 use RKW\RkwNewsletter\Domain\Repository\PagesRepository;
 use RKW\RkwNewsletter\Domain\Repository\PagesLanguageOverlayRepository;
 use RKW\RkwNewsletter\Domain\Repository\TtContentRepository;
+use RKW\RkwBasics\Domain\Repository\FileReferenceRepository;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /*
@@ -93,6 +95,11 @@ class IssueTest extends FunctionalTestCase
     private $ttContentRepository;
 
     /**
+     * @var \RKW\RkwBasics\Domain\Repository\FileReferenceRepository
+     */
+    protected $fileReferenceRepository;
+
+    /**
      * @var \TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager
      */
     private $persistenceManager = null;
@@ -116,14 +123,15 @@ class IssueTest extends FunctionalTestCase
         $this->setUpFrontendRootPage(
             1,
             [
-                'EXT:rkw_newsletter/Configuration/TypoScript/setup.txt',
-                //'EXT:rkw_registration/Configuration/TypoScript/setup.txt',
-                //'EXT:rkw_mailer/Configuration/TypoScript/setup.txt',
+                'EXT:rkw_newsletter/Configuration/TypoScript/setup.typoscript',
+                'EXT:rkw_registration/Configuration/TypoScript/setup.txt',
+                'EXT:rkw_mailer/Configuration/TypoScript/setup.txt',
 
-                // TYPO3\CMS\Extbase\Persistence\Generic\Storage\Exception\SqlErrorException : Table 'rkw_dev_komze_ft1bdbb4e.tx_rkwbasics_domain_model_filereference' doesn't exist
                 'EXT:rkw_basics/Configuration/TypoScript/setup.txt',
                 'EXT:rkw_authors/Configuration/TypoScript/setup.txt',
-                //'EXT:rkw_newsletter/Tests/Integration/Helper/Fixtures/Frontend/Configuration/Rootpage.typoscript',
+                'EXT:rkw_newsletter/Tests/Integration/Helper/Fixtures/Frontend/Configuration/Rootpage.typoscript',
+
+
             ]
         );
 
@@ -138,6 +146,7 @@ class IssueTest extends FunctionalTestCase
         $this->pagesRepository = $this->objectManager->get(PagesRepository::class);
         $this->pagesLanguageOverlayRepository = $this->objectManager->get(PagesLanguageOverlayRepository::class);
         $this->ttContentRepository = $this->objectManager->get(TtContentRepository::class);
+        $this->fileReferenceRepository = $this->objectManager->get(FileReferenceRepository::class);
     }
 
 
@@ -175,7 +184,7 @@ class IssueTest extends FunctionalTestCase
 
 
     /**
-     * @test
+     *  @test
      */
     public function CreateContainerPageWithRelationToCertainTopic()
     {
@@ -244,7 +253,7 @@ class IssueTest extends FunctionalTestCase
 
 
     /**
-     * @test
+     *
      */
     public function CreateContainerPageTranslationIfSysLanguageUidIsGreaterThanZero()
     {
@@ -275,7 +284,9 @@ class IssueTest extends FunctionalTestCase
         $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
         $issueHelper->setContainerPage($containerPage);
         $issueHelper->setNewsletter($newsletter);
-        $containerPageLanguageOverlay = $issueHelper->createContainerPageTranslation();
+        $issueHelper->createContainerPageTranslation();
+
+        $containerPageLanguageOverlay = $this->pagesLanguageOverlayRepository->findAll()->getFirst();
 
         static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\PagesLanguageOverlay', $containerPageLanguageOverlay);
         static::assertEquals($containerPage->getTitle(), $containerPageLanguageOverlay->getTitle());
@@ -395,7 +406,13 @@ class IssueTest extends FunctionalTestCase
         $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
         $issueHelper->setNewsletter($newsletter);
         $issueHelper->setContainerPage($containerPage);
-        $ttContentElement = $issueHelper->createContentElement($newsletterTeaserPage);
+        $issueHelper->createContentElement($newsletterTeaserPage);
+
+        // we have to persist the functions work
+        $this->persistenceManager->persistAll();
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
+        $ttContentElement = $this->ttContentRepository->findByPid($containerPage->getUid())->getFirst();
 
         static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\TtContent', $ttContentElement);
         static::assertEquals($ttContentElement->getPid(), $containerPage->getUid());
@@ -433,11 +450,18 @@ class IssueTest extends FunctionalTestCase
         /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
         $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
         $issueHelper->setNewsletter($newsletter);
-        $newFileReference = $issueHelper->createFileReference($page, $ttContentElement);
+        $issueHelper->createFileReference($page, $ttContentElement);
 
-        static::assertInstanceOf('RKW\\RkwBasics\\Domain\\Model\\FileReference', $newFileReference);
-        static::assertEquals($ttContentElement->getUid(), $newFileReference->getUidForeign());
-        static::assertEquals('tt_content', $newFileReference->getTablenames());
+        // we have to persist the functions work
+        $this->persistenceManager->persistAll();
+
+        static::assertInstanceOf('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage', $ttContentElement->getImage());
+        foreach ($ttContentElement->getImage() as $singleImage) {
+            static::assertInstanceOf('RKW\\RkwBasics\\Domain\\Model\\FileReference', $singleImage);
+            static::assertEquals($ttContentElement->getUid(), $singleImage->getUidForeign());
+            static::assertEquals('tt_content', $singleImage->getTablenames());
+            static::assertCount(1, $ttContentElement->getImage());
+        }
     }
 
 
@@ -453,8 +477,8 @@ class IssueTest extends FunctionalTestCase
          * Given Page
          * Given ContainerElement
          * When a content element is created without an image
-         * Then no file reference is instantiated
-         * Then the return value is null
+         * Then no file reference is created for this content element
+         * Then the count of the objectStorage in 0
          */
 
         /** @var \RKW\RkwNewsletter\Domain\Model\Newsletter $newsletter */
@@ -469,10 +493,13 @@ class IssueTest extends FunctionalTestCase
         /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
         $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
         $issueHelper->setNewsletter($newsletter);
-        $newFileReference = $issueHelper->createFileReference($page, $ttContentElement);
+        $issueHelper->createFileReference($page, $ttContentElement);
 
-        static::assertNotInstanceOf('RKW\\RkwBasics\\Domain\\Model\\FileReference', $newFileReference);
-        static::assertNull($newFileReference);
+        // we have to persist the functions work
+        $this->persistenceManager->persistAll();
+
+        static::assertInstanceOf('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage', $ttContentElement->getImage());
+        static::assertCount(0, $ttContentElement->getImage());
     }
 
 

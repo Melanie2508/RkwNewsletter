@@ -1,50 +1,109 @@
-module.tx_rkwmailer {
-    view {
+config.tx_extbase.persistence {
 
-        layoutRootPaths {
-            0 = EXT:rkw_mailer/Resources/Private/Layouts/
-            1 = EXT:rkw_mailer/Tests/Functional/Service/Fixtures/Frontend/Rootpage/Layouts/
+    // make sure ref_index is updated
+    updateReferenceIndex = 1
+
+    // enableAutomaticCacheClearing = 1
+    classes {
+
+        // Subclasses
+        RKW\RkwBasics\Domain\Model\Pages {
+            subclasses {
+                Tx_RkwNewsletter_Pages = RKW\RkwNewsletter\Domain\Model\Pages
+            }
         }
 
-        # cat=module.tx_rkwmailer/file; type=string; label=Path to template root (BE)
-        templateRootPaths {
-            0 = EXT:rkw_mailer/Resources/Private/Templates/
-            1 = EXT:rkw_mailer/Tests/Functional/Service/Fixtures/Frontend/Rootpage/Templates/
+        // Classes
+        RKW\RkwNewsletter\Domain\Model\Pages {
+            mapping {
+                tableName = pages
+                columns {
+                    doktype.mapOnProperty = dokType
+                    perms_userid.mapOnProperty = permsUserId
+                    perms_groupid.mapOnProperty = permsGroupId
+                    perms_user.mapOnProperty = permsUser
+                    perms_group.mapOnProperty = permsGroup
+                    perms_everybody.mapOnProperty = permsEverybody
+                }
+            }
         }
 
-        # cat=module.tx_rkwmailer/file; type=string; label=Path to template layouts (BE)
-        partialRootPaths {
-            0 = EXT:rkw_mailer/Resources/Private/Partials/
-            1 = EXT:rkw_mailer/Tests/Functional/Service/Fixtures/Frontend/Rootpage/Partials/
+        #===============================================
+
+        RKW\RkwNewsletter\Domain\Model\PagesLanguageOverlay {
+            mapping {
+                tableName = pages_language_overlay
+                columns {
+                    sys_language_uid.mapOnProperty = sysLanguageUid
+                    uid.mapOnProperty = uid
+                    pid.mapOnProperty = pid
+                }
+            }
         }
-    }
-    persistence {
-        # cat=module.tx_rkwmailer//a; type=string; label=Default storage PID
-        storagePid = 9999
-    }
 
+        #===============================================
 
-    settings {
+        RKW\RkwNewsletter\Domain\Model\TtContent {
+            mapping {
+                tableName = tt_content
+                columns {
+                    CType.mapOnProperty = contentType
+                    imagecols.mapOnProperty = imageCols
+                    uid.mapOnProperty = uid
+                    pid.mapOnProperty = pid
+                    sys_language_uid.mapOnProperty = sysLanguageUid
 
-        # cat=module.tx_rkwmailer; type=integer; label=Pid of redirect plugin
-        redirectPid = 9999
+                }
+            }
+        }
 
-        # cat=module.tx_rkwmailer; type=integer; label= Delay for redirect (in sec)
-        redirectDelay = 5
+        #===============================================
 
-        # cat=module.tx_rkwmailer; type=integer; label=Pid of plugin for pixel counter (HTML-mails only)
-        counterPixelPid = 1
+        RKW\RkwRegistration\Domain\Model\FrontendUser {
+            subclasses {
+                Tx_RkwNewsletter_FrontendUser = RKW\RkwNewsletter\Domain\Model\FrontendUser
+            }
+        }
 
-        # cat=module.tx_rkwmailer; type=integer; label=URL for hard-links in templates
-        baseUrl = http://www.example.de
+        RKW\RkwNewsletter\Domain\Model\FrontendUser {
+            mapping {
+                tableName = fe_users
+            }
+        }
 
-        # cat=module.tx_rkwmailer; type=integer; label=URL for images in templates
-        basePathImages =  EXT:rkw_mailer/Resources/Public/Images
+        #===============================================
 
-        # cat=module.tx_rkwmailer; type=integer; label=URL for logo in templates
-        basePathLogo = EXT:rkw_mailer/Resources/Public/Images/logo.png
+        RKW\RkwRegistration\Domain\Model\BackendUser {
+            subclasses {
+                Tx_RkwNewsletter_BackendUser = RKW\RkwNewsletter\Domain\Model\BackendUser
+            }
+        }
+
+        RKW\RkwNewsletter\Domain\Model\BackendUser {
+            mapping {
+                tableName = be_users
+            }
+        }
     }
 }
 
-plugin.tx_rkwmailer < module.tx_rkwmailer
 
+plugin.tx_rkwnewsletter {
+
+
+    persistence {
+        # cat=plugin.tx_rkwnewsletter//a; type=string; label=Default storage PID
+        storagePid = 999
+    }
+
+    settings {
+
+    }
+}
+
+module.tx_rkwnewsletter {
+
+    persistence < plugin.tx_rkwnewsletter.persistence
+    settings < plugin.tx_rkwnewsletter.settings
+
+}

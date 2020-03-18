@@ -108,11 +108,13 @@ class TtContentRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * add
      * Workaround because extension of repository doesn't seem to work properly here
      *
+     * @deprecated Use common extbase model functions instead
+     *
      * @toDo: remove this work-around
      * @param \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement
      * @return void
      */
-    public function add($ttContentElement)
+    public function add_OLD($ttContentElement)
     {
 
         $authorsList = array();
@@ -147,6 +149,8 @@ class TtContentRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     /**
      * updateImage
      * Workaround because extension of repository doesn't seem to work properly here
+     *
+     * @deprecated use addImage() instead
      *
      * @toDo: remove this work-around
      * @param \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement

@@ -196,6 +196,149 @@ class TtContentRepositoryTest extends FunctionalTestCase
 
 
     /**
+     * @test
+     */
+    public function addTextPicElement()
+    {
+        /**
+         * Scenario:
+         *
+         * When a tt_content element is set with several data (matching the old "add"-Funktion)
+         * Then an instance of TtContent is created
+         * Then the uid is set after persisting
+         * Then the PID is still the same
+         * Then a crdate is created and set by the ttContent Model constructor
+         * Then the content_type is still "textpic"
+         * Then the field ImageCols is still 1
+         * Then the image returns count of 0
+         * Then the sysLanguageUid is 0 (default)
+         * Then the header is still the same string
+         * Then the bodytext is still the same string
+         * Then the header link is still the same string
+         */
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
+        $headerText = 'My test header';
+        $bodytext = 'My test bodytext';
+        $headerLink = 'www.myheaderlink.de';
+        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
+        $ttContentElement->setPid(3456);
+        $ttContentElement->setSysLanguageUid(0);
+        $ttContentElement->setContentType('textpic');
+        $ttContentElement->setImageCols(1);
+        $ttContentElement->setHeader($headerText);
+        $ttContentElement->setBodytext($bodytext);
+        $ttContentElement->setHeaderLink($headerLink);
+
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $result */
+        $this->subject->add($ttContentElement);
+
+        $this->persistenceManager->persistAll();
+
+        self::assertInstanceOf('\RKW\RkwNewsletter\Domain\Model\TtContent', $ttContentElement);
+        // means: It's successful persisted. If not, we would have logically no uid
+        // (a not created uid is the main reason to write this test)
+        self::assertNotEquals(0, $ttContentElement->getUid());
+        self::assertEquals(3456, $ttContentElement->getPid());
+        self::assertGreaterThan(0, $ttContentElement->getCrdate());
+        self::assertEquals('textpic', $ttContentElement->getContentType());
+        self::assertEquals(1, $ttContentElement->getImageCols());
+        self::assertCount(0, $ttContentElement->getImage());
+        self::assertEquals(0, $ttContentElement->getSysLanguageUid());
+        self::assertEquals($headerText, $ttContentElement->getHeader());
+        self::assertEquals($bodytext, $ttContentElement->getBodytext());
+        self::assertEquals($headerLink, $ttContentElement->getHeaderLink());
+    }
+
+
+    /**
+     * @test
+     */
+    public function addTextPicElementAddSingleAuthor()
+    {
+        /**
+         * Scenario:
+         *
+         * When a tt_content element is created
+         * When an author element is created
+         * When this author is added to the tt_content element
+         * Than a tt_content element is created
+         * Than one author is set in this tt_content element
+         */
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
+        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
+        $ttContentElement->setContentType('textpic');
+        $ttContentElement->setImageCols(1);
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\Authors $authorElement */
+        $authorElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
+        $authorElement->setFirstName('John');
+        $authorElement->setLastName('Doe');
+        $ttContentElement->addTxRkwNewsletterAuthors($authorElement);
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $result */
+        $this->subject->add($ttContentElement);
+
+        $this->persistenceManager->persistAll();
+
+        self::assertInstanceOf('\RKW\RkwNewsletter\Domain\Model\TtContent', $ttContentElement);
+        self::assertCount(1, $ttContentElement->getTxRkwNewsletterAuthors());
+    }
+
+
+
+    /**
+     * @test
+     */
+    public function addTextPicElementSetAuthorWithinObjectStorage()
+    {
+        /**
+         * Scenario:
+         *
+         * When a tt_content element is created
+         * When an author element 1 is created
+         * When an author element 2 is created
+         * When an object storage is created
+         * When both authors are added to this object storage
+         * Than a tt_content element is created
+         * Than both authors are set in this tt_content element
+         */
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
+        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
+        $ttContentElement->setContentType('textpic');
+        $ttContentElement->setImageCols(1);
+
+         /** @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage $objectStorage */
+        $objectStorage = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage');
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\Authors $authorElement1 */
+        $authorElement1 = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
+        $authorElement1->setFirstName('John');
+        $authorElement1->setLastName('Doe');
+        $objectStorage->attach($authorElement1);
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\Authors $authorElement2 */
+        $authorElement2 = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
+        $authorElement2->setFirstName('Jane');
+        $authorElement2->setLastName('Doe');
+        $objectStorage->attach($authorElement2);
+
+        $ttContentElement->setTxRkwNewsletterAuthors($objectStorage);
+
+        /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $result */
+        $this->subject->add($ttContentElement);
+
+        $this->persistenceManager->persistAll();
+
+        self::assertInstanceOf('\RKW\RkwNewsletter\Domain\Model\TtContent', $ttContentElement);
+        self::assertCount(2, $ttContentElement->getTxRkwNewsletterAuthors());
+    }
+
+
+    /**
      * TearDown
      */
     protected function tearDown()

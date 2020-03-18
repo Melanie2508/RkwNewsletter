@@ -105,12 +105,24 @@ class TtContent extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $txRkwnewsletterIsEditorial;
 
     /**
+     * txRkwbasicsBodytextMobile
+     * Included because tests throws following error:
+     * TYPO3\CMS\Extbase\Persistence\Generic\Storage\Exception\SqlErrorException : Field 'tx_rkwbasics_bodytext_mobile' doesn't have a default value
+     *
+     * @var boolean
+     */
+    protected $txRkwbasicsBodytextMobile = '';
+
+    /**
      * __construct
      */
     public function __construct()
     {
         //Do not remove the next line: It would break the functionality
         $this->initStorageObjects();
+
+        // it's not created by itself
+        $this->setCrdate(time());
     }
 
 
@@ -405,12 +417,33 @@ class TtContent extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the uid
      *
-     * @param bool $uid
+     * @param bool $txRkwnewsletterIsEditorial
      * @return void
      */
     public function setTxRkwnewsletterIsEditorial($txRkwnewsletterIsEditorial)
     {
         $this->txRkwnewsletterIsEditorial = $txRkwnewsletterIsEditorial;
+    }
+
+    /**
+     * Returns the txRkwbasicsBodytextMobile
+     *
+     * @return boolean $txRkwbasicsBodytextMobile
+     */
+    public function getTxRkwbasicsBodytextMobile()
+    {
+        return $this->txRkwbasicsBodytextMobile;
+    }
+
+    /**
+     * Sets the txRkwbasicsBodytextMobile
+     *
+     * @param boolean $txRkwbasicsBodytextMobile
+     * @return void
+     */
+    public function setTxRkwbasicsBodytextMobile($txRkwbasicsBodytextMobile)
+    {
+        $this->txRkwbasicsBodytextMobile = $txRkwbasicsBodytextMobile;
     }
 
 

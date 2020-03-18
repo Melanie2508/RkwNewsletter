@@ -348,7 +348,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
                 $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Created translation-page with uid=%s and SysLanguageUid=%s for container page with id=%s for newsletter with id=%s.', $this->containerPageLanguageOverlay->getUid(), $this->newsletter->getSysLanguageUid(), $this->containerPage->getUid(), $this->newsletter->getUid()));
 
                 // just for testing - we don't want so punish the DB with senseless persist-queries
-                return $this->containerPageLanguageOverlay;
+                //return $this->containerPageLanguageOverlay;
                 //===
             }
         }
@@ -411,7 +411,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
      * createContentElement
      *
      * @param \RKW\RkwNewsletter\Domain\Model\Pages $page
-     * @return \RKW\RkwNewsletter\Domain\Model\TtContent
+     * @return void
      */
     public function createContentElement(\RKW\RkwNewsletter\Domain\Model\Pages $page)
     {
@@ -458,11 +458,6 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
 
         // 3.4 set image
         $this->createFileReference($page, $ttContentElement);
-
-        // just for testing
-        // one the one hand, a persistAll does not have an effect. On the other hand, we don't want so punish the DB with senseless queries
-        return $ttContentElement;
-        //===
     }
 
 
@@ -472,7 +467,7 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
      *
      * @param \RKW\RkwNewsletter\Domain\Model\Pages $page
      * @param \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement
-     * @return \RKW\RkwBasics\Domain\Model\FileReference
+     * @return void
      */
     public function createFileReference(\RKW\RkwNewsletter\Domain\Model\Pages $page, $ttContentElement)
     {
@@ -496,15 +491,11 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
 
             $this->fileReferenceRepository->add($fileReference);
 
-            // $ttContentElement->addImage($fileReference);
+            $ttContentElement->addImage($fileReference);
             // $ttContentRepository->update($ttContentElement);
-            $this->ttContentRepository->updateImage($ttContentElement);
+            //$this->ttContentRepository->updateImage($ttContentElement);
             $this->getLogger()->log(\TYPO3\CMS\Core\Log\LogLevel::INFO, sprintf('Added a fileReference with uid=%s to tt-content-element with id=%s for newsletter with id=%s.', $fileReference->getUid(), $ttContentElement->getUid(), $this->newsletter->getUid()));
         }
-
-        // just for testing
-        return $fileReference;
-        //===
     }
 
 

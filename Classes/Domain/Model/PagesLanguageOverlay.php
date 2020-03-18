@@ -26,6 +26,13 @@ namespace RKW\RkwNewsletter\Domain\Model;
 class PagesLanguageOverlay extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
 {
     /**
+     * pid
+     *
+     * @var integer
+     */
+    protected $pid;
+
+    /**
      * title
      *
      * @var string
@@ -84,9 +91,30 @@ class PagesLanguageOverlay extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntit
     protected $txRkwbasicsInformation = '';
 
     /**
+     * Returns the pid
+     *
+     * @return integer $pid
+     */
+    public function getPid()
+    {
+        return $this->pid;
+    }
+
+    /**
+     * Sets the title
+     *
+     * @param integer $pid
+     * @return void
+     */
+    public function setPid($pid)
+    {
+        $this->pid = $pid;
+    }
+
+    /**
      * Returns the title
      *
-     * @return integer $title
+     * @return string $title
      */
     public function getTitle()
     {
@@ -96,7 +124,7 @@ class PagesLanguageOverlay extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntit
     /**
      * Sets the title
      *
-     * @param integer $title
+     * @param string $title
      * @return void
      */
     public function setTitle($title)
