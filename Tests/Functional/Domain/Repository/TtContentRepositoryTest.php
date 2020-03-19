@@ -7,6 +7,7 @@ use RKW\RkwNewsletter\Domain\Repository\TtContentRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use RKW\RkwNewsletter\Domain\Model\Authors;
 /*
  * This file is part of the TYPO3 CMS project.
  *
@@ -37,6 +38,7 @@ class TtContentRepositoryTest extends FunctionalTestCase
         'typo3conf/ext/rkw_registration',
         'typo3conf/ext/rkw_mailer',
         'typo3conf/ext/rkw_newsletter',
+        'typo3conf/ext/rkw_authors',
     ];
     /**
      * @var string[]
@@ -71,6 +73,7 @@ class TtContentRepositoryTest extends FunctionalTestCase
                 'EXT:rkw_basics/Configuration/TypoScript/setup.txt',
                 'EXT:rkw_registration/Configuration/TypoScript/setup.txt',
                 'EXT:rkw_mailer/Configuration/TypoScript/setup.txt',
+                'EXT:rkw_authors/Configuration/TypoScript/setup.txt',
                 'EXT:rkw_newsletter/Configuration/TypoScript/setup.txt',
                 'EXT:rkw_newsletter/Tests/Functional/Utility/Fixtures/Frontend/Configuration/Rootpage.typoscript',
             ]
@@ -203,7 +206,7 @@ class TtContentRepositoryTest extends FunctionalTestCase
         /**
          * Scenario:
          *
-         * When a tt_content element is set with several data (matching the old "add"-Funktion)
+         * When a tt_content element is set with several data (matching the deprecated "add"-Function)
          * Then an instance of TtContent is created
          * Then the uid is set after persisting
          * Then the PID is still the same
@@ -221,7 +224,7 @@ class TtContentRepositoryTest extends FunctionalTestCase
         $headerText = 'My test header';
         $bodytext = 'My test bodytext';
         $headerLink = 'www.myheaderlink.de';
-        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
+        $ttContentElement = GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
         $ttContentElement->setPid(3456);
         $ttContentElement->setSysLanguageUid(0);
         $ttContentElement->setContentType('textpic');
@@ -230,7 +233,6 @@ class TtContentRepositoryTest extends FunctionalTestCase
         $ttContentElement->setBodytext($bodytext);
         $ttContentElement->setHeaderLink($headerLink);
 
-
         /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $result */
         $this->subject->add($ttContentElement);
 
@@ -238,7 +240,7 @@ class TtContentRepositoryTest extends FunctionalTestCase
 
         self::assertInstanceOf('\RKW\RkwNewsletter\Domain\Model\TtContent', $ttContentElement);
         // means: It's successful persisted. If not, we would have logically no uid
-        // (a not created uid is the main reason to write this test)
+        // (a not created uid is the main reason to write this test - a manually written add-function leads to persistent problems)
         self::assertNotEquals(0, $ttContentElement->getUid());
         self::assertEquals(3456, $ttContentElement->getPid());
         self::assertGreaterThan(0, $ttContentElement->getCrdate());
@@ -268,12 +270,12 @@ class TtContentRepositoryTest extends FunctionalTestCase
          */
 
         /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
-        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
+        $ttContentElement = GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
         $ttContentElement->setContentType('textpic');
         $ttContentElement->setImageCols(1);
 
         /** @var \RKW\RkwNewsletter\Domain\Model\Authors $authorElement */
-        $authorElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
+        $authorElement = GeneralUtility::makeInstance(Authors::class);
         $authorElement->setFirstName('John');
         $authorElement->setLastName('Doe');
         $ttContentElement->addTxRkwNewsletterAuthors($authorElement);
@@ -307,21 +309,21 @@ class TtContentRepositoryTest extends FunctionalTestCase
          */
 
         /** @var \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement */
-        $ttContentElement = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
+        $ttContentElement = GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\TtContent');
         $ttContentElement->setContentType('textpic');
         $ttContentElement->setImageCols(1);
 
          /** @var \TYPO3\CMS\Extbase\Persistence\ObjectStorage $objectStorage */
-        $objectStorage = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage');
+        $objectStorage = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage');
 
         /** @var \RKW\RkwNewsletter\Domain\Model\Authors $authorElement1 */
-        $authorElement1 = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
+        $authorElement1 = GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
         $authorElement1->setFirstName('John');
         $authorElement1->setLastName('Doe');
         $objectStorage->attach($authorElement1);
 
         /** @var \RKW\RkwNewsletter\Domain\Model\Authors $authorElement2 */
-        $authorElement2 = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
+        $authorElement2 = GeneralUtility::makeInstance('RKW\\RkwNewsletter\\Domain\\Model\\Authors');
         $authorElement2->setFirstName('Jane');
         $authorElement2->setLastName('Doe');
         $objectStorage->attach($authorElement2);

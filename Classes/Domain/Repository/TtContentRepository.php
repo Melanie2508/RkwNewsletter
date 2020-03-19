@@ -108,7 +108,7 @@ class TtContentRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * add
      * Workaround because extension of repository doesn't seem to work properly here
      *
-     * @deprecated Use common extbase model functions instead
+     * @deprecated Use common extbase functions instead
      *
      * @toDo: remove this work-around
      * @param \RKW\RkwNewsletter\Domain\Model\TtContent $ttContentElement
