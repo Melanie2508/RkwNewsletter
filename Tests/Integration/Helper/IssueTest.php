@@ -212,8 +212,11 @@ class IssueTest extends FunctionalTestCase
         $issueHelper->setNewsletter($newsletter);
         $issueHelper->createContainerPage($topic);
 
-        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $issueHelper->getContainerPage());
-        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Topic', $issueHelper->getContainerPage()->getTxRkwnewsletterTopic());
+        // get the page
+        $createdContainerPage = $this->pagesRepository->findByUid(4700);
+
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $createdContainerPage);
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Topic', $createdContainerPage->getTxRkwnewsletterTopic());
     }
 
 
@@ -246,8 +249,11 @@ class IssueTest extends FunctionalTestCase
         $issueHelper->setNewsletter($newsletter);
         $issueHelper->createContainerPage($topic);
 
-        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $issueHelper->getContainerPage());
-        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Topic', $issueHelper->getContainerPage()->getTxRkwnewsletterTopic());
+        // get the page
+        $createdContainerPage = $this->pagesRepository->findByUid(4700);
+
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Pages', $createdContainerPage);
+        static::assertInstanceOf('RKW\\RkwNewsletter\\Domain\\Model\\Topic', $createdContainerPage->getTxRkwnewsletterTopic());
     }
 
 
@@ -500,6 +506,42 @@ class IssueTest extends FunctionalTestCase
 
         static::assertInstanceOf('TYPO3\\CMS\\Extbase\\Persistence\\ObjectStorage', $ttContentElement->getImage());
         static::assertCount(0, $ttContentElement->getImage());
+    }
+
+
+    /**
+     * @test
+     */
+    public function CreateContainerPageDataCheck()
+    {
+        /**
+         * Scenario:
+         *
+         * Given Issue
+         * Given Newsletter
+         * Given Topic
+         * When a containerPage is created
+         * When a specific topic is set
+         * Then an instance of pages (containerPage) is created
+         * Then TxRkwnewsletterExclude is true
+         */
+
+        $issue = $this->issueRepository->findByIdentifier(1);
+        $newsletter = $this->newsletterRepository->findByIdentifier(1);
+        $topic = $this->topicRepository->findByIdentifier(1);
+
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        /** @var \RKW\RkwNewsletter\Helper\Issue $issueHelper */
+        $issueHelper = $objectManager->get('RKW\\RkwNewsletter\\Helper\\Issue');
+        $issueHelper->setIssue($issue);
+        $issueHelper->setNewsletter($newsletter);
+        $issueHelper->createContainerPage($topic);
+
+        // get the page
+        $createdContainerPage = $this->pagesRepository->findByUid(4700);
+
+        static::assertTrue($createdContainerPage->getTxRkwnewsletterExclude());
     }
 
 

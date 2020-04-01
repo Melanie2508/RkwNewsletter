@@ -560,17 +560,6 @@ class Issue implements \TYPO3\CMS\Core\SingletonInterface
         $this->containerPage = $containerPage;
     }
 
-    /**
-     * getContainerPage
-     * !! USE THIS ONLY FOR TESTING PURPOSE !!
-     *
-     * @return \RKW\RkwNewsletter\Domain\Model\Pages
-     */
-    public function getContainerPage()
-    {
-        return $this->containerPage;
-        //===
-    }
 
     /**
      * getContainerPageLanguageOverlay
